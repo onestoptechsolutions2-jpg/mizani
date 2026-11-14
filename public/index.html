@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#2a47d1">
+<title>Mizani</title>
+<style>
+:root{--ink:#1c2333;--paper:#f2f4f9;--surface:#fff;--line:#dce1ec;--muted:#5b647a;--accent:#2a47d1;--accent-ink:#fff;--good:#157a4a;--good-bg:#e4f4ec;--warn:#9a5b00;--warn-bg:#fdf1dc;--bad:#b3261e;--bad-bg:#fbe8e6;--r:8px}
+@media (prefers-color-scheme:dark){:root{--ink:#e7eaf3;--paper:#11141c;--surface:#1a1f2e;--line:#2b3247;--muted:#97a0b6;--accent:#8aa0ff;--accent-ink:#0b1030;--good:#55c78d;--good-bg:#13281f;--warn:#e3a847;--warn-bg:#2d2411;--bad:#ff8f86;--bad-bg:#32181a}}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0 0 .5rem;line-height:1.2}h2{font-size:1.25rem}h3{font-size:1rem}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.muted{color:var(--muted)}.small{font-size:.85rem}
+.btn{border:1px solid var(--line);background:var(--surface);padding:.5rem .8rem;border-radius:var(--r);cursor:pointer;min-height:40px}
+.btn:hover{border-color:var(--accent)}.btn:focus-visible,input:focus-visible,select:focus-visible,.strip:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.danger{color:var(--bad);border-color:var(--bad)}.btn.sm{min-height:32px;padding:.2rem .6rem}
+input,select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:.5rem .6rem;min-height:40px;width:100%}
+label{display:block;font-size:.85rem;color:var(--muted);margin:.5rem 0 .2rem}
+table{border-collapse:collapse;width:100%}th,td{padding:.45rem .6rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-weight:600;color:var(--muted);font-size:.85rem}
+tr.total td{font-weight:700;border-top:2px solid var(--ink)}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end}.row>*{flex:1 1 140px}.row>.fit{flex:0 0 auto}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:1rem;margin-bottom:1rem}
+.chip{display:inline-block;padding:.1rem .55rem;border-radius:99px;font-size:.8rem;background:var(--paper);border:1px solid var(--line)}
+.chip.good{background:var(--good-bg);color:var(--good);border-color:transparent}.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}.chip.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+#app{display:grid;grid-template-columns:190px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+header{grid-column:1/3;display:flex;gap:1rem;align-items:center;padding:.6rem 1rem;background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.strip{flex:1 1 320px;display:flex;gap:.6rem;align-items:center;border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:.35rem .9rem;cursor:pointer;text-align:left}
+.strip .dot{width:12px;height:12px;border-radius:50%;background:var(--muted);flex:none}
+.strip.ok{background:var(--good-bg);border-color:transparent}.strip.ok .dot{background:var(--good)}
+.strip.bad{background:var(--bad-bg);border-color:var(--bad)}.strip.bad .dot{background:var(--bad)}
+.strip b{font-weight:700}
+nav{padding:.75rem;border-right:1px solid var(--line);background:var(--surface)}
+nav button{display:block;width:100%;text-align:left;border:0;background:none;padding:.65rem .75rem;border-radius:var(--r);cursor:pointer;font-weight:500}
+nav button[aria-current=true]{background:var(--accent);color:var(--accent-ink)}
+main{padding:1rem;min-width:0}
+.sell{display:grid;grid-template-columns:230px 1fr 340px;gap:1rem;align-items:start}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem}
+.item{min-height:76px;text-align:left;display:flex;flex-direction:column;justify-content:space-between}
+.billrow{display:flex;justify-content:space-between;gap:.5rem;padding:.55rem .6rem;border:1px solid var(--line);border-radius:var(--r);margin-bottom:.4rem;cursor:pointer;background:var(--surface)}
+.billrow[aria-current=true]{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.tabs{display:flex;gap:.3rem;margin-bottom:1rem;flex-wrap:wrap}.tabs button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:.35rem .9rem;cursor:pointer}.tabs button[aria-current=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);max-width:min(520px,94vw);width:100%;padding:1.2rem}
+dialog::backdrop{background:rgba(10,14,25,.5)}
+#toast{position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:50;display:grid;gap:.4rem}
+.toast{background:var(--ink);color:var(--paper);padding:.6rem 1rem;border-radius:var(--r);max-width:90vw}.toast.err{background:var(--bad);color:#fff}
+.auth{max-width:440px;margin:6vh auto;padding:0 1rem}.auth h1{font-size:2rem;letter-spacing:-.02em}
+.scroll{overflow-x:auto}
+@media (max-width:980px){.sell{grid-template-columns:1fr}}
+@media (max-width:760px){#app{grid-template-columns:1fr;padding-bottom:64px}nav{position:fixed;bottom:0;left:0;right:0;display:flex;border-top:1px solid var(--line);border-right:0;padding:.3rem;z-index:20;padding-bottom:calc(.3rem + env(safe-area-inset-bottom))}nav button{text-align:center;padding:.5rem .2rem;font-size:.8rem}header{grid-column:1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="root"></div><div id="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+// The DOM turns arrays and false into the text "[object HTMLDivElement]" / "false". Flatten and drop empties everywhere, once.
+for (const m of ['append', 'prepend', 'replaceChildren']) { const orig = Element.prototype[m]; Element.prototype[m] = function (...a) { return orig.apply(this, a.flat(9).filter((k) => k != null && k !== false)); }; }
+const S = { token: null, business: '', user: null, health: null, page: 'sell', bill: null, cache: {}, outlet: localStorage.getItem('mz_outlet') || '', billTab: 'open', outlets: [] };
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'value') e.value = v; else if (v === true) e.setAttribute(k, ''); else e.setAttribute(k, v);
+  }
+  for (const k of kids.flat(9)) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+const kes = (c) => (c / 100).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const toCents = (v) => Math.round(parseFloat(String(v).replace(/,/g, '')) * 100);
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
+function toast(msg, err) { const t = h('div', { class: 'toast' + (err ? ' err' : '') }, msg); $('#toast').append(t); setTimeout(() => t.remove(), err ? 6000 : 2800); }
+
+async function api(method, url, body, idem) {
+  const res = await fetch('/api' + url, { method, headers: { 'content-type': 'application/json', ...(S.token ? { authorization: 'Bearer ' + S.token } : {}), ...(idem ? { 'idempotency-key': idem } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && S.token) { signOut(); throw new Error('Please sign in again'); }
+  if (!res.ok) throw Object.assign(new Error(data.error || 'Request failed'), { status: res.status, detail: data.detail });
+  return data;
+}
+async function act(fn, ok) { try { const r = await fn(); if (ok) toast(ok); refreshHealth(); return r; } catch (e) { toast(e.message, true); } }
+
+// ---------------------------------------------------------------- forms
+function field(f) {
+  let input;
+  if (f.type === 'select') input = h('select', { name: f.name }, (f.options || []).map((o) => h('option', { value: o.value ?? o }, o.label ?? o)));
+  else if (f.type === 'checkbox') input = h('input', { type: 'checkbox', name: f.name, style: 'width:auto;min-height:0' });
+  else if (f.type === 'textarea') input = h('textarea', { name: f.name, rows: 2 });
+  else input = h('input', { name: f.name, type: f.type || 'text', step: f.step, placeholder: f.placeholder, autocomplete: 'off', inputmode: f.type === 'number' ? 'decimal' : undefined });
+  if (f.value !== undefined) { if (f.type === 'checkbox') input.checked = !!f.value; else input.value = f.value; }
+  return h('div', {}, h('label', {}, f.label), input);
+}
+function form(fields, submitLabel, onSubmit) {
+  const f = h('div', {}, h('div', { class: 'row' }, fields.map(field)), h('div', { style: 'margin-top:.8rem' }, h('button', { class: 'btn primary', type: 'button', onclick: async (ev) => {
+    const v = {}; for (const el of f.querySelectorAll('[name]')) v[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+    ev.target.disabled = true; try { await onSubmit(v, f); } finally { ev.target.disabled = false; }
+  } }, submitLabel)));
+  return f;
+}
+function dialog(title, body, actions) {
+  const d = h('dialog', {}, h('h3', {}, title), body, h('div', { class: 'row', style: 'margin-top:1rem;justify-content:flex-end' }, actions(() => d.close())));
+  d.addEventListener('close', () => d.remove()); document.body.append(d); d.showModal(); return d;
+}
+async function approverFields() {
+  const list = await api('GET', '/approvers');
+  return [{ name: 'approver_id', label: 'Approved by', type: 'select', options: list.map((a) => ({ value: a.id, label: a.name })) }, { name: 'pin', label: 'Approver PIN', type: 'password' }];
+}
+const approverOf = (v) => ({ user_id: v.approver_id, pin: v.pin });
+async function names() {
+  const [items, stores, parties, accounts] = await Promise.all([api('GET', '/items'), api('GET', '/stores'), api('GET', '/parties'), api('GET', '/accounts')]);
+  S.cache = { items, stores, parties, accounts }; return S.cache;
+}
+const opt = (list, label = (x) => x.name) => list.map((x) => ({ value: x.id ?? x.code, label: label(x) }));
+
+// ---------------------------------------------------------------- shell
+function signOut() { S.token = null; S.user = null; localStorage.removeItem('mz'); render(); }
+function render() { const r = $('#root'); r.replaceChildren(S.token ? shell() : authView()); if (S.token) { go(S.page); refreshHealth(); loadOutlets(); } }
+async function loadOutlets() { try { S.outlets = await api('GET', '/outlets'); const sel = $('#outletsel'); if (sel && S.outlets.length > 1) { sel.replaceChildren(h('option', { value: '' }, 'All outlets'), S.outlets.map((o) => h('option', { value: o.id }, o.name))); sel.value = S.outlet; sel.style.display = ''; } } catch (e) {} }
+function authView() {
+  let mode = 'in';
+  const box = h('div', { class: 'auth' });
+  const draw = () => box.replaceChildren(h('h1', {}, 'Mizani'), h('p', { class: 'muted' }, 'Restaurant and bar books that always balance.'),
+    h('div', { class: 'tabs' }, h('button', { 'aria-current': mode === 'in', onclick: () => { mode = 'in'; draw(); } }, 'Sign in'), h('button', { 'aria-current': mode === 'up', onclick: () => { mode = 'up'; draw(); } }, 'Create a business')),
+    mode === 'in'
+      ? form([{ name: 'slug', label: 'Business address', placeholder: 'my-lounge' }, { name: 'email', label: 'Email', type: 'email' }, { name: 'password', label: 'Password', type: 'password' }], 'Sign in', async (v) => { const r = await act(() => api('POST', '/auth/login', v)); if (r) start(r); })
+      : form([{ name: 'business_name', label: 'Business name' }, { name: 'slug', label: 'Business address (letters, numbers, hyphens)', placeholder: 'my-lounge' }, { name: 'owner_name', label: 'Your name' }, { name: 'email', label: 'Email', type: 'email' }, { name: 'password', label: 'Password (8+ characters)', type: 'password' }, { name: 'pin', label: 'Manager PIN (4 to 8 digits, used to approve voids and complimentary items)', type: 'password' }, { name: 'demo', label: 'Start with a sample menu', type: 'checkbox', value: true }], 'Create business', async (v) => { const r = await act(() => api('POST', '/signup', v)); if (r) start(r); }));
+  draw(); const wrap = h('div', {}, box, h('div', { class: 'auth', style: 'margin-top:0' }, healthCheckView())); return wrap;
+}
+function start(r) { S.token = r.token; S.business = r.business; S.user = r.user; localStorage.setItem('mz', JSON.stringify({ token: r.token, business: r.business, user: r.user })); S.page = ['owner', 'manager', 'accountant'].includes(r.user.role) ? 'sell' : 'sell'; render(); }
+const NAV = [['sell', 'Sell', ['owner', 'manager', 'cashier', 'waiter']], ['stock', 'Stock', ['owner', 'manager', 'storekeeper', 'accountant']], ['buy', 'Buy', ['owner', 'manager', 'storekeeper', 'accountant']], ['money', 'Money', ['owner', 'manager', 'accountant']], ['reports', 'Reports', ['owner', 'manager', 'accountant']], ['more', 'More', ['owner', 'manager', 'accountant', 'cashier']], ['setup', 'Setup', ['owner', 'manager']]];
+function shell() {
+  const nav = h('nav', {}, NAV.filter((n) => n[2].includes(S.user.role)).map(([id, label]) => h('button', { 'data-page': id, onclick: () => go(id) }, label)));
+  const strip = h('button', { class: 'strip', id: 'strip', onclick: showHealth, 'aria-label': 'Books health' }, h('span', { class: 'dot' }), h('span', { id: 'striptext' }, 'Checking the books…'));
+  return h('div', { id: 'app' }, h('header', {}, h('span', { class: 'brand' }, 'Mizani'), h('span', { class: 'muted' }, S.business), strip,
+    h('select', { id: 'outletsel', style: 'width:auto;display:none', 'aria-label': 'Outlet', onchange: (e) => { S.outlet = e.target.value; localStorage.setItem('mz_outlet', S.outlet); go(S.page); } }),
+    h('span', { class: 'small muted' }, `${S.user.name} · ${S.user.role}`), h('button', { class: 'btn sm', onclick: signOut }, 'Sign out')), nav, h('main', { id: 'main' }, h('div', { id: 'banner' })));
+}
+async function refreshHealth() {
+  if (!S.token || !$('#strip')) return;
+  try {
+    const r = await api('GET', '/reconcile'); S.health = r;
+    const s = $('#strip'); s.className = 'strip ' + (r.ok ? 'ok' : 'bad');
+    $('#striptext').replaceChildren(r.ok ? h('span', {}, h('b', {}, 'Books balanced'), ` · debits ${kes(r.totals.debit)} = credits ${kes(r.totals.credit)}`) : h('span', {}, h('b', {}, 'Books need attention'), ` · ${r.checks.filter((c) => !c.ok).length} check(s) failing`));
+  } catch (e) { /* offline or signed out */ }
+}
+function showHealth() {
+  const r = S.health; if (!r) return;
+  dialog('Books health', h('div', {}, h('p', { class: 'muted small' }, 'These checks run on every change and again at day end. Each one compares the ledger with the records behind it.'),
+    h('table', {}, r.checks.map((c) => h('tr', {}, h('td', {}, h('span', { class: 'chip ' + (c.ok ? 'good' : 'bad') }, c.ok ? 'pass' : 'fail')), h('td', {}, c.name, !c.ok && h('div', { class: 'small', style: 'color:var(--bad)' }, c.detail)))))),
+    (close) => [h('button', { class: 'btn primary', onclick: close }, 'Close')]);
+}
+function go(id) {
+  S.page = id;
+  for (const b of document.querySelectorAll('nav button')) b.setAttribute('aria-current', b.dataset.page === id);
+  const m = $('#main'); m.replaceChildren(h('p', { class: 'muted' }, 'Loading…'));
+  api('GET', '/billing').then((b) => { if (b.access && b.access.message) toast(b.access.message, !b.access.writable); }).catch(() => {});
+  ({ sell: pageSell, stock: pageStock, buy: pageBuy, money: pageMoney, reports: pageReports, more: pageMore, setup: pageSetup })[id](m).catch((e) => m.replaceChildren(h('p', { style: 'color:var(--bad)' }, e.message)));
+}
+const tabs = (opts, cur, set) => h('div', { class: 'tabs' }, opts.map(([id, label]) => h('button', { 'aria-current': id === cur, onclick: () => set(id) }, label)));
+
+// ---------------------------------------------------------------- sell
+async function pageSell(m) {
+  const [items, bills] = await Promise.all([api('GET', '/items?filter=sellable'), api('GET', `/bills?status=${S.billTab}&outlet=${S.outlet}`)]);
+  const left = h('div', {}), mid = h('div', {}), right = h('div', { class: 'panel' });
+  const reload = () => pageSell(m);
+  const tableIn = h('input', { placeholder: 'Table or name' });
+  left.append(h('h2', {}, 'Open bills'), h('div', { class: 'row', style: 'margin-bottom:.6rem' }, tableIn, h('button', { class: 'btn primary fit', onclick: async () => { const b = await act(() => api('POST', '/bills', { table_name: tableIn.value || null, outlet_id: S.outlet || undefined })); if (b) { S.bill = b.id; S.billTab = 'open'; reload(); } } }, 'New bill')),
+    h('div', { class: 'tabs' }, [['open', 'Open'], ['closed', 'Paid']].map(([id, label]) => h('button', { 'aria-current': S.billTab === id, onclick: () => { S.billTab = id; reload(); } }, label))),
+    bills.length ? bills.slice(0, 40).map((b) => h('div', { class: 'billrow', 'aria-current': S.bill === b.id, onclick: () => { S.bill = b.id; reload(); } }, h('span', {}, b.table_name || b.number), h('span', { class: 'num' }, kes(b.balance)))) : h('p', { class: 'muted' }, 'No open bills. Start one to take an order.'));
+  mid.append(h('h2', {}, 'Menu'), h('div', { class: 'items' }, items.map((i) => h('button', { class: 'btn item', onclick: async () => {
+    if (!S.bill) { const b = await act(() => api('POST', '/bills', { outlet_id: S.outlet || undefined })); if (!b) return; S.bill = b.id; }
+    if (await act(() => api('POST', `/bills/${S.bill}/lines`, { item_id: i.id, qty: '1' }))) reload();
+  } }, h('span', {}, i.name), h('span', { class: 'num muted' }, kes(i.sell_price))))));
+  if (!S.bill) right.append(h('p', { class: 'muted' }, 'Pick an open bill or tap a menu item to start one.'));
+  else {
+    const b = await api('GET', `/bills/${S.bill}`).catch(() => null);
+    if (!b) { S.bill = null; return reload(); }
+    const active = b.lines.filter((l) => l.status === 'active');
+    right.append(h('h2', {}, b.table_name || b.number, ' ', h('span', { class: 'chip ' + (b.status === 'open' ? 'warn' : 'good') }, b.status)),
+      h('table', {}, active.map((l) => h('tr', {}, h('td', {}, l.item_name, l.prepared_at && h('span', { class: 'chip small', style: 'margin-left:.3rem' }, 'prepared')),
+        h('td', { class: 'num' }, Number(l.qty)),
+        h('td', { class: 'num' }, kes(l.payable)),
+        h('td', { class: 'num' }, b.status === 'open' && [
+          !l.prepared_at && h('button', { class: 'btn sm', 'aria-label': 'Less', onclick: async () => { if (await act(() => api('PATCH', `/bills/${b.id}/lines/${l.id}`, { qty: String(Number(l.qty) - 1) }))) reload(); } }, '−'), ' ',
+          !l.prepared_at && h('button', { class: 'btn sm', 'aria-label': 'More', onclick: async () => { if (await act(() => api('PATCH', `/bills/${b.id}/lines/${l.id}`, { qty: String(Number(l.qty) + 1) }))) reload(); } }, '+'), ' ',
+          !l.prepared_at && h('button', { class: 'btn sm', title: 'Kitchen has made it', onclick: async () => { if (await act(() => api('POST', `/bills/${b.id}/lines/${l.id}/prepared`))) reload(); } }, 'Made'), ' ',
+          h('button', { class: 'btn sm danger', onclick: () => removeDialog(b, l, reload) }, 'Remove')])))),
+      h('table', {}, h('tr', {}, h('td', {}, 'Bill total'), h('td', { class: 'num' }, kes(active.reduce((s, l) => s + l.payable, 0)))), b.payments.map((p) => h('tr', {}, h('td', { class: 'muted' }, 'Paid · ' + p.method), h('td', { class: 'num' }, '−' + kes(p.amount)))), h('tr', { class: 'total' }, h('td', {}, 'Balance'), h('td', { class: 'num' }, kes(b.balance)))));
+    if (b.status === 'open') {
+      const amt = h('input', { value: (b.balance / 100).toFixed(2), inputmode: 'decimal' }), tip = h('input', { placeholder: 'Tip (optional)', inputmode: 'decimal' });
+      const pay = (method) => async () => { const key = uuid(); if (await act(() => api('POST', `/bills/${b.id}/payments`, { method, amount: toCents(amt.value), tip: tip.value ? toCents(tip.value) : 0 }, key), 'Payment recorded')) reload(); };
+      right.append(h('div', { class: 'row' }, h('div', {}, h('label', {}, 'Amount received (KES)'), amt), h('div', {}, h('label', {}, 'Tip (KES)'), tip)), h('div', { class: 'row', style: 'margin-top:.5rem' }, ['cash', 'mpesa', 'card'].map((k) => h('button', { class: 'btn primary', onclick: pay(k) }, k === 'mpesa' ? 'M-Pesa' : k[0].toUpperCase() + k.slice(1)))),
+        h('div', { class: 'row', style: 'margin-top:.8rem' }, h('button', { class: 'btn', onclick: () => otherPayDialog(b, reload) }, 'Deposit, gift card, points…'), h('button', { class: 'btn', onclick: () => closeDialog(b, reload) }, 'Close without full payment…')),
+        h('div', { class: 'row', style: 'margin-top:.5rem' }, h('button', { class: 'btn', onclick: async () => { const p = prompt('Service charge %', '10'); if (p && await act(() => api('POST', `/bills/${b.id}/service-charge`, { percent_bp: Math.round(parseFloat(p) * 100) }), 'Service charge added')) reload(); } }, 'Service charge…'), h('button', { class: 'btn', onclick: async () => { const k = await act(() => api('POST', `/bills/${b.id}/kot`)); if (k) { if (k.lines) printText('Kitchen order', k.text); else toast('Nothing new to send to the kitchen'); reload(); } } }, 'Kitchen ticket'), h('button', { class: 'btn', onclick: () => printReceipt(b.id) }, 'Receipt'), h('button', { class: 'btn danger', onclick: () => voidDialog(b, reload) }, 'Void…')));
+    } else if (b.status === 'closed') {
+      right.append(h('div', { class: 'row', style: 'margin-top:.8rem' }, h('button', { class: 'btn', onclick: () => printReceipt(b.id) }, 'Print receipt'), b.disposition === 'paid' && h('button', { class: 'btn danger', onclick: () => refundDialog(b, reload) }, 'Refund an item…')));
+    }
+  }
+  m.replaceChildren(h('div', { class: 'sell' }, left, mid, right));
+}
+async function removeDialog(b, l, reload) {
+  const af = l.prepared_at && ['waiter', 'cashier'].includes(S.user.role) ? await approverFields() : [];
+  const body = form([{ name: 'reason', label: l.prepared_at ? 'Why is a prepared item being removed? (required)' : 'Reason (optional)' }, ...af], 'Remove item', async (v) => {
+    if (await act(() => api('DELETE', `/bills/${b.id}/lines/${l.id}`, { reason: v.reason, approver: af.length ? approverOf(v) : undefined }), 'Item removed')) { d.close(); reload(); }
+  });
+  const d = dialog('Remove ' + l.item_name, h('div', {}, l.prepared_at && h('p', { class: 'small muted' }, 'The kitchen already made this. Revenue is reversed and the cost goes to Wastage.'), body), (close) => [h('button', { class: 'btn', onclick: close }, 'Cancel')]);
+}
+async function voidDialog(b, reload) {
+  const d = dialog('Void ' + (b.table_name || b.number), form([{ name: 'reason', label: 'Reason (required)' }], 'Request void', async (v) => { if (await act(() => api('POST', `/bills/${b.id}/void-request`, v), 'Sent to a manager for approval')) { d.close(); reload(); } }), (close) => [h('button', { class: 'btn', onclick: close }, 'Cancel')]);
+}
+async function closeDialog(b, reload) {
+  const [parties, af] = await Promise.all([api('GET', '/parties'), approverFields()]);
+  const kinds = [{ value: 'credit', label: 'Put on customer credit' }, { value: 'staff', label: 'Deduct from staff' }, { value: 'complimentary', label: 'Complimentary (on the house)' }, { value: 'writeoff', label: 'Write off (not collected)' }];
+  const body = form([{ name: 'disposition', label: 'What happens to the balance?', type: 'select', options: kinds }, { name: 'customer_id', label: 'Customer (for credit)', type: 'select', options: opt(parties.filter((p) => p.kind === 'customer')) }, { name: 'staff_id', label: 'Staff member (for deduction)', type: 'select', options: opt(parties.filter((p) => p.kind === 'staff')) }, { name: 'reason', label: 'Reason' }, ...af], 'Close bill', async (v) => {
+    const send = { disposition: v.disposition, customer_id: v.customer_id || undefined, staff_id: v.staff_id || undefined, reason: v.reason, approver: v.pin ? approverOf(v) : undefined };
+    if (await act(() => api('POST', `/bills/${b.id}/close`, send), 'Bill closed')) { d.close(); S.bill = null; reload(); }
+  });
+  const d = dialog('Close ' + (b.table_name || b.number) + ` · ${kes(b.balance)} owing`, h('div', {}, h('p', { class: 'small muted' }, 'Credit within the customer’s limit needs no approval. Everything else needs a manager’s PIN.'), body), (close) => [h('button', { class: 'btn', onclick: close }, 'Cancel')]);
+}
+
+// ---------------------------------------------------------------- stock
+async function pageStock(m, tab = 'hand') {
+  const { items, stores } = await names();
+  const body = h('div', {});
+  m.replaceChildren(h('h2', {}, 'Stock'), tabs([['hand', 'On hand'], ['count', 'Stock take'], ['waste', 'Wastage'], ['move', 'Move stock'], ['ok', 'Approvals']], tab, (t) => pageStock(m, t)), body);
+  const stocked = items.filter((i) => i.is_stocked);
+  if (tab === 'hand') {
+    const rows = await api('GET', '/stock');
+    body.append(rows.length ? h('div', { class: 'scroll' }, h('table', {}, h('tr', {}, ['Item', 'Store', 'Quantity', 'Value (KES)'].map((x) => h('th', {}, x))), rows.map((r) => h('tr', {}, h('td', {}, r.name), h('td', {}, r.store), h('td', { class: 'num', style: Number(r.qty) < 0 ? 'color:var(--bad)' : '' }, Number(r.qty) + ' ' + r.base_unit), h('td', { class: 'num' }, kes(r.value)))), h('tr', { class: 'total' }, h('td', {}, 'Total'), h('td'), h('td'), h('td', { class: 'num' }, kes(rows.reduce((s, r) => s + r.value, 0)))))) : h('p', { class: 'muted' }, 'No stock yet. Record a purchase on the Buy tab to bring stock in.'));
+  } else if (tab === 'count') {
+    const takes = await api('GET', '/stock-takes');
+    body.append(h('div', { class: 'panel' }, h('h3', {}, 'Start a count'), h('p', { class: 'small muted' }, 'Counts are blind: you will not see the quantity the system expects. A different person approves the result.'),
+      form([{ name: 'store_id', label: 'Store', type: 'select', options: opt(stores) }], 'Start count', async (v) => { const t = await act(() => api('POST', '/stock-takes', v)); if (t) countView(body, t.id, m); })),
+      h('div', { class: 'panel' }, h('h3', {}, 'Recent counts'), takes.length ? h('table', {}, takes.map((t) => h('tr', {}, h('td', {}, t.number), h('td', {}, t.store), h('td', {}, h('span', { class: 'chip ' + (t.status === 'approved' ? 'good' : t.status === 'rejected' ? 'bad' : 'warn') }, t.status.replace('_', ' '))), h('td', {}, h('button', { class: 'btn sm', onclick: () => countView(body, t.id, m) }, 'Open'))))) : h('p', { class: 'muted' }, 'No counts yet.')));
+  } else if (tab === 'waste') {
+    const reasons = await api('GET', '/wastage/reasons'); const key = uuid();
+    body.append(h('div', { class: 'panel' }, form([{ name: 'item_id', label: 'Item', type: 'select', options: opt(stocked) }, { name: 'store_id', label: 'Store', type: 'select', options: opt(stores) }, { name: 'qty', label: 'Quantity', type: 'number', step: 'any' }, { name: 'reason', label: 'Reason', type: 'select', options: reasons.map((r) => ({ value: r.code, label: r.label })) }, { name: 'note', label: 'Note' }, { name: 'date', label: 'Date (leave empty for today)', type: 'date' }], 'Record wastage', async (v) => {
+      const r = await act(() => api('POST', '/wastage', { ...v, date: v.date || undefined }, key), 'Wastage recorded'); if (r) pageStock(m, 'waste');
+    }), h('p', { class: 'small muted' }, 'Entries dated more than 2 days back need a manager’s approval before they take effect.')));
+  } else if (tab === 'move') {
+    body.append(h('div', { class: 'panel' }, h('h3', {}, 'Move stock between stores'), form([{ name: 'from_store', label: 'From', type: 'select', options: opt(stores) }, { name: 'to_store', label: 'To', type: 'select', options: opt(stores) }, { name: 'item_id', label: 'Item', type: 'select', options: opt(stocked) }, { name: 'qty', label: 'Quantity', type: 'number', step: 'any' }], 'Move', async (v) => { await act(() => api('POST', '/stock/transfers', { from_store: v.from_store, to_store: v.to_store, lines: [{ item_id: v.item_id, qty: v.qty }] }), 'Stock moved'); })),
+      h('div', { class: 'panel' }, h('h3', {}, 'Use up consumables'), form([{ name: 'item_id', label: 'Item', type: 'select', options: opt(stocked) }, { name: 'store_id', label: 'Store', type: 'select', options: opt(stores) }, { name: 'qty', label: 'Quantity', type: 'number', step: 'any' }, { name: 'department', label: 'Department', value: 'Kitchen' }], 'Record use', async (v) => { await act(() => api('POST', '/stock/consume', v), 'Recorded'); })));
+  } else approvalsView(body);
+}
+async function countView(body, id, m) {
+  const t = await api('GET', `/stock-takes/${id}`);
+  const inputs = {};
+  body.replaceChildren(h('div', { class: 'panel' }, h('h3', {}, `${t.number} · ${t.store_name} `, h('span', { class: 'chip' }, t.status.replace('_', ' '))),
+    h('div', { class: 'scroll' }, h('table', {}, h('tr', {}, ['Item', 'Counted', t.lines.some((l) => l.system_qty != null) ? 'System' : null, t.lines.some((l) => l.variance != null) ? 'Difference' : null].filter(Boolean).map((x) => h('th', {}, x))),
+      t.lines.map((l) => h('tr', {}, h('td', {}, l.name, h('span', { class: 'muted small' }, ' · ' + l.base_unit)),
+        h('td', {}, t.status === 'counting' ? (inputs[l.item_id] = h('input', { type: 'number', step: 'any', min: '0', value: l.counted_qty != null ? Number(l.counted_qty) : '', style: 'max-width:130px' })) : Number(l.counted_qty)),
+        l.system_qty != null && h('td', { class: 'num' }, Number(l.system_qty)),
+        l.variance != null && h('td', { class: 'num', style: Number(l.variance) < 0 ? 'color:var(--bad)' : Number(l.variance) > 0 ? 'color:var(--good)' : '' }, Number(l.variance)))))),
+    t.status === 'counting' && h('div', { class: 'row', style: 'margin-top:1rem' }, h('button', { class: 'btn', onclick: async () => { await act(() => api('POST', `/stock-takes/${id}/counts`, { counts: Object.entries(inputs).filter(([, el]) => el.value !== '').map(([item_id, el]) => ({ item_id, qty: el.value })) }), 'Counts saved'); } }, 'Save counts'),
+      h('button', { class: 'btn primary', onclick: async () => { const ok = await act(async () => { await api('POST', `/stock-takes/${id}/counts`, { counts: Object.entries(inputs).filter(([, el]) => el.value !== '').map(([item_id, el]) => ({ item_id, qty: el.value })) }); return api('POST', `/stock-takes/${id}/submit`); }, 'Submitted for approval'); if (ok) countView(body, id, m); } }, 'Submit for approval')),
+    h('p', { style: 'margin-top:1rem' }, h('button', { class: 'btn sm', onclick: () => pageStock(m, 'count') }, 'Back'))));
+}
+async function approvalsView(body) {
+  const list = await api('GET', '/approvals?status=pending').catch(() => []);
+  body.replaceChildren(h('div', { class: 'panel' }, h('h3', {}, 'Waiting for approval'), list.length ? h('table', {}, list.map((a) => h('tr', {}, h('td', {}, h('span', { class: 'chip warn' }, a.kind.replace('_', ' '))), h('td', {}, a.payload.number || a.payload.reason || '', h('div', { class: 'small muted' }, 'requested by ' + a.requested_by_name)),
+    h('td', {}, a.kind === 'stock_take' && h('button', { class: 'btn sm', onclick: () => countView(body, a.subject_id, body) }, 'Review'), ' ',
+      h('button', { class: 'btn sm primary', onclick: async () => { if (await act(() => api('POST', `/approvals/${a.id}/approve`, {}), 'Approved')) approvalsView(body); } }, 'Approve'), ' ',
+      h('button', { class: 'btn sm danger', onclick: async () => { if (await act(() => api('POST', `/approvals/${a.id}/reject`, {}), 'Rejected')) approvalsView(body); } }, 'Reject'))))) : h('p', { class: 'muted' }, 'Nothing is waiting. You cannot approve your own requests.')));
+}
+
+// ---------------------------------------------------------------- buy
+async function pageBuy(m) {
+  const { items, stores, parties, accounts } = await names();
+  const lines = [], rowsEl = h('div', {});
+  const today = new Date().toISOString().slice(0, 10);
+  const draw = () => rowsEl.replaceChildren(lines.length ? h('table', {}, h('tr', {}, ['What', 'Qty', 'Unit', 'Price (KES, no VAT)', 'VAT %', ''].map((x) => h('th', {}, x))), lines.map((l, i) => h('tr', {}, h('td', {}, l.label), h('td', {}, l.qty ?? ''), h('td', {}, l.unit ?? ''), h('td', { class: 'num' }, kes(l.type === 'stock' ? l.unit_price : l.amount)), h('td', {}, (l.tax_rate_bp || 0) / 100), h('td', {}, h('button', { class: 'btn sm', onclick: () => { lines.splice(i, 1); draw(); } }, 'Remove'))))) : h('p', { class: 'muted' }, 'No lines yet.'));
+  draw();
+  const head = form([{ name: 'supplier_id', label: 'Supplier', type: 'select', options: opt(parties.filter((p) => p.kind === 'supplier')) }, { name: 'store_id', label: 'Received into', type: 'select', options: opt(stores) }, { name: 'delivery_date', label: 'Delivery date (when the goods arrived)', type: 'date', value: today }], 'Save purchase', async (v) => {
+    if (!lines.length) return toast('Add at least one line', true);
+    const r = await act(() => api('POST', '/purchases', { ...v, lines: lines.map(({ label, ...l }) => l) }), 'Purchase saved'); if (r) pageBuy(m);
+  });
+  const add = h('div', { class: 'panel' }, h('h3', {}, 'Add a line'));
+  const stockForm = form([{ name: 'item_id', label: 'Stock item', type: 'select', options: opt(items.filter((i) => i.is_stocked)) }, { name: 'qty', label: 'Quantity', type: 'number', step: 'any' }, { name: 'unit', label: 'Unit (base unit if empty)', placeholder: 'e.g. carton' }, { name: 'price', label: 'Price per unit (KES, no VAT)', type: 'number', step: '0.01' }, { name: 'vat', label: 'VAT %', type: 'number', value: 0 }], 'Add stock line', (v) => {
+    const it = items.find((i) => i.id === v.item_id); lines.push({ type: 'stock', item_id: v.item_id, qty: v.qty, unit: v.unit || undefined, unit_price: toCents(v.price), tax_rate_bp: Math.round(Number(v.vat) * 100), label: it.name }); draw();
+  });
+  const costForm = form([{ name: 'type', label: 'Type', type: 'select', options: [{ value: 'expense', label: 'Expense (repair, delivery, supplies)' }, { value: 'asset', label: 'Asset (equipment)' }] }, { name: 'account', label: 'Account', type: 'select', options: opt(accounts.filter((a) => ['expense', 'asset'].includes(a.type) && !['1000', '1010', '1020', '1030', '1100', '1110', '1120', '1200', '1400'].includes(a.code)), (a) => `${a.code} ${a.name}`) }, { name: 'description', label: 'Description' }, { name: 'amount', label: 'Amount (KES, no VAT)', type: 'number', step: '0.01' }, { name: 'vat', label: 'VAT %', type: 'number', value: 0 }], 'Add cost line', (v) => { lines.push({ type: v.type, account: v.account, description: v.description, amount: toCents(v.amount), tax_rate_bp: Math.round(Number(v.vat) * 100), label: v.description || v.account }); draw(); });
+  add.append(h('p', { class: 'small muted' }, 'Stock lines bring stock in. Anything that is not stock goes to an expense or asset account, never to Inventory.'), stockForm, h('hr'), costForm);
+  const list = await api('GET', '/purchases');
+  m.replaceChildren(h('h2', {}, 'Buy'), h('div', { class: 'panel' }, head, rowsEl), add, h('div', { class: 'panel scroll' }, h('h3', {}, 'Recent purchases'), list.length ? h('table', {}, h('tr', {}, ['No.', 'Supplier', 'Delivered', 'Total', 'Owed', ''].map((x) => h('th', {}, x))), list.map((p) => h('tr', {}, h('td', {}, p.number, p.late_entry && h('span', { class: 'chip warn small', style: 'margin-left:.3rem' }, 'late entry')), h('td', {}, p.supplier), h('td', {}, p.delivery_date), h('td', { class: 'num' }, kes(p.total)), h('td', { class: 'num' }, kes(p.outstanding)), h('td', {}, p.outstanding > 0 && h('button', { class: 'btn sm', onclick: () => payDialog(p, m) }, 'Pay supplier'))))) : h('p', { class: 'muted' }, 'No purchases yet.')));
+}
+function payDialog(p, m) {
+  const d = dialog(`Pay ${p.supplier} · ${p.number}`, form([{ name: 'amount', label: 'Amount (KES)', type: 'number', value: (p.outstanding / 100).toFixed(2) }, { name: 'method', label: 'Paid by', type: 'select', options: [{ value: 'cash', label: 'Cash' }, { value: 'mpesa', label: 'M-Pesa' }, { value: 'bank', label: 'Bank' }, { value: 'card', label: 'Card' }] }], 'Record payment', async (v) => { if (await act(() => api('POST', `/purchases/${p.id}/payments`, { method: v.method, amount: toCents(v.amount) }), 'Payment recorded')) { d.close(); pageBuy(m); } }), (close) => [h('button', { class: 'btn', onclick: close }, 'Cancel')]);
+}
+
+// ---------------------------------------------------------------- money
+async function pageMoney(m, tab = 'day') {
+  const body = h('div', {});
+  m.replaceChildren(h('h2', {}, 'Money'), tabs([['day', 'Day end'], ['cash', 'Cash'], ['exp', 'Expenses'], ['owed', 'Debtors and staff']], tab, (t) => pageMoney(m, t)), body);
+  const { accounts } = await names();
+  if (tab === 'day') {
+    const d = await api('GET', '/day');
+    body.append(h('div', { class: 'panel' }, h('h3', {}, 'Trading day ' + (d.business_date || 'not started')), h('p', { class: 'small muted' }, 'The day closes only when everything below is clear. Nothing is skipped.'),
+      h('table', {}, d.checklist.map((c) => h('tr', {}, h('td', {}, h('span', { class: 'chip ' + (c.ok ? 'good' : 'bad') }, c.ok ? 'clear' : 'open')), h('td', {}, c.label, h('div', { class: 'small muted' }, c.detail))))),
+      h('p', { style: 'margin-top:1rem' }, h('button', { class: 'btn primary', disabled: !d.ready_to_close, onclick: async () => { if (await act(() => api('POST', '/day/close', {}), 'Day closed')) pageMoney(m, 'day'); } }, 'Close the day'))));
+  } else if (tab === 'cash') {
+    body.append(h('div', { class: 'panel' }, h('h3', {}, 'Count the cash'), h('p', { class: 'small muted' }, 'Any difference between what you count and what the books expect is recorded as Cash over and short.'), form([{ name: 'counted', label: 'Cash counted (KES)', type: 'number', step: '0.01' }], 'Record count', async (v) => { const r = await act(() => api('POST', '/cash/count', { counted: toCents(v.counted) })); if (r) toast(r.variance === 0 ? 'Cash agrees with the books' : `Difference ${kes(r.variance)} recorded`); })),
+      h('div', { class: 'panel' }, h('h3', {}, 'Bank cash'), form([{ name: 'amount', label: 'Amount banked (KES)', type: 'number', step: '0.01' }, { name: 'reference', label: 'Slip number' }], 'Record banking', async (v) => { await act(() => api('POST', '/cash/bank', { amount: toCents(v.amount), reference: v.reference }), 'Banking recorded'); })));
+  } else if (tab === 'exp') {
+    const sup = (await api('GET', '/parties?kind=supplier')).map((p) => ({ value: p.id, label: p.name }));
+    body.append(h('div', { class: 'panel' }, form([{ name: 'account', label: 'Expense', type: 'select', options: opt(accounts.filter((a) => a.type === 'expense'), (a) => a.name).map((o, i, arr) => ({ value: accounts.filter((a) => a.type === 'expense')[i].code, label: o.label })) }, { name: 'amount', label: 'Amount (KES, no VAT)', type: 'number', step: '0.01' }, { name: 'vat', label: 'VAT amount (KES)', type: 'number', step: '0.01', value: 0 }, { name: 'method', label: 'Paid by', type: 'select', options: [{ value: 'cash', label: 'Cash' }, { value: 'mpesa', label: 'M-Pesa' }, { value: 'bank', label: 'Bank' }, { value: 'card', label: 'Card' }, { value: 'credit', label: 'On credit (pay later)' }] }, { name: 'supplier_id', label: 'Supplier (for credit)', type: 'select', options: sup }, { name: 'description', label: 'What for' }], 'Record expense', async (v) => { await act(() => api('POST', '/expenses', { account: v.account, amount: toCents(v.amount), vat: toCents(v.vat || 0), method: v.method, supplier_id: v.method === 'credit' ? v.supplier_id : undefined, description: v.description }), 'Expense recorded'); })));
+  } else {
+    for (const [kind, title] of [['customer', 'Customers who owe'], ['staff', 'Staff who owe']]) {
+      const rows = (await api('GET', `/reports/balances/${kind}`)).filter((r) => r.balance !== 0);
+      body.append(h('div', { class: 'panel' }, h('h3', {}, title), rows.length ? h('table', {}, rows.map((r) => h('tr', {}, h('td', {}, r.name), h('td', { class: 'num' }, kes(r.balance)), h('td', {}, h('button', { class: 'btn sm', onclick: () => { const d = dialog('Payment from ' + r.name, form([{ name: 'amount', label: 'Amount (KES)', type: 'number', value: (r.balance / 100).toFixed(2) }, { name: 'method', label: 'Paid by', type: 'select', options: ['cash', 'mpesa', 'card', 'bank'] }], 'Record payment', async (v) => { if (await act(() => api('POST', `/parties/${r.id}/receipts`, { amount: toCents(v.amount), method: v.method }), 'Payment recorded')) { d.close(); pageMoney(m, 'owed'); } }), (c) => [h('button', { class: 'btn', onclick: c }, 'Cancel')]); } }, 'Receive payment'))))) : h('p', { class: 'muted' }, 'Nobody owes anything.')));
+    }
+  }
+}
+
+// ---------------------------------------------------------------- reports
+async function pageReports(m, tab = 'tb', range = {}) {
+  const body = h('div', { class: 'scroll' });
+  const q = new URLSearchParams(Object.entries(range).filter(([, v]) => v)).toString();
+  const from = h('input', { type: 'date', value: range.from || '' }), to = h('input', { type: 'date', value: range.to || '' });
+  m.replaceChildren(h('h2', {}, 'Reports'), tabs([['tb', 'Trial balance'], ['pnl', 'Profit and loss'], ['bs', 'Balance sheet'], ['cust', 'Customers'], ['sup', 'Suppliers']], tab, (t) => pageReports(m, t, range)),
+    h('div', { class: 'row', style: 'margin-bottom:1rem;max-width:560px' }, h('div', {}, h('label', {}, 'From'), from), h('div', {}, h('label', {}, 'To'), to), h('button', { class: 'btn fit', onclick: () => pageReports(m, tab, { from: from.value, to: to.value }) }, 'Apply dates')), body);
+  const sect = (title, rows) => [h('tr', {}, h('th', { colspan: 2 }, title)), ...rows.map((r) => h('tr', {}, h('td', {}, r.name), h('td', { class: 'num' }, kes(r.amount))))];
+  if (tab === 'tb') {
+    const t = await api('GET', '/reports/trial-balance?' + q);
+    body.append(h('table', {}, h('tr', {}, ['Code', 'Account', 'Debit', 'Credit'].map((x, i) => h('th', { class: i > 1 ? 'num' : '' }, x))), t.rows.map((r) => h('tr', {}, h('td', {}, r.code), h('td', {}, r.name), h('td', { class: 'num' }, r.debit ? kes(r.debit) : ''), h('td', { class: 'num' }, r.credit ? kes(r.credit) : ''))), h('tr', { class: 'total' }, h('td'), h('td', {}, t.balanced ? 'Totals (balanced)' : 'Totals (OUT OF BALANCE)'), h('td', { class: 'num' }, kes(t.totals.debit)), h('td', { class: 'num' }, kes(t.totals.credit)))));
+  } else if (tab === 'pnl') {
+    const p = await api('GET', '/reports/pnl?' + q);
+    body.append(h('table', {}, sect('Income', p.income), h('tr', { class: 'total' }, h('td', {}, 'Revenue'), h('td', { class: 'num' }, kes(p.revenue))), sect('Cost of sales', p.cost_of_sales), h('tr', { class: 'total' }, h('td', {}, 'Gross profit'), h('td', { class: 'num' }, kes(p.gross_profit))), sect('Expenses', p.expenses), h('tr', { class: 'total' }, h('td', {}, 'Net profit'), h('td', { class: 'num' }, kes(p.net_profit)))));
+  } else if (tab === 'bs') {
+    const b = await api('GET', '/reports/balance-sheet?' + (range.to ? 'to=' + range.to : ''));
+    body.append(h('table', {}, sect('Assets', b.assets), h('tr', { class: 'total' }, h('td', {}, 'Total assets'), h('td', { class: 'num' }, kes(b.total_assets))), sect('Liabilities', b.liabilities), sect('Equity', [...b.equity, { name: 'Earnings to date', amount: b.earnings_to_date }]), h('tr', { class: 'total' }, h('td', {}, 'Liabilities + equity'), h('td', { class: 'num' }, kes(b.total_liabilities + b.total_equity)))));
+  } else {
+    const rows = await api('GET', '/reports/balances/' + (tab === 'cust' ? 'customer' : 'supplier'));
+    body.append(h('table', {}, h('tr', {}, h('th', {}, 'Name'), h('th', { class: 'num' }, tab === 'cust' ? 'Owes you' : 'You owe')), rows.map((r) => h('tr', {}, h('td', {}, r.name), h('td', { class: 'num' }, kes(r.balance))))));
+  }
+}
+
+// ---------------------------------------------------------------- setup
+async function pageSetup(m) {
+  const { items, stores, parties, accounts } = await names();
+  const recipeBox = h('div', {}), menu = items.filter((i) => i.is_sellable), stocked = items.filter((i) => i.is_stocked);
+  const comps = []; let cur = null;
+  const drawRecipe = () => recipeBox.replaceChildren(h('table', {}, comps.map((c, i) => h('tr', {}, h('td', {}, (items.find((x) => x.id === c.item_id) || {}).name), h('td', {}, (stores.find((x) => x.id === c.store_id) || {}).name), h('td', { class: 'num' }, c.qty), h('td', {}, h('button', { class: 'btn sm', onclick: () => { comps.splice(i, 1); drawRecipe(); } }, 'Remove'))))));
+  const pickRecipe = h('select', { onchange: (e) => { cur = e.target.value; comps.length = 0; const it = items.find((x) => x.id === cur); for (const k of (it && it.recipe) || []) comps.push({ item_id: k.item_id, store_id: k.store_id, qty: Number(k.qty) }); drawRecipe(); } }, h('option', { value: '' }, 'Choose a menu item…'), menu.map((i) => h('option', { value: i.id }, i.name)));
+  const users = ['owner', 'manager'].includes(S.user.role) ? await api('GET', '/users') : [];
+  m.replaceChildren(h('h2', {}, 'Setup'),
+    h('div', { class: 'panel' }, h('h3', {}, 'Add an item'), form([{ name: 'name', label: 'Name' }, { name: 'unit', label: 'Unit', value: 'each' }, { name: 'price', label: 'Selling price (KES, with VAT)', type: 'number', step: '0.01', value: 0 }, { name: 'vat', label: 'VAT %', type: 'number', value: 16 }, { name: 'sellable', label: 'Sold to customers', type: 'checkbox', value: true }, { name: 'stocked', label: 'Tracked in stock', type: 'checkbox' }, { name: 'store_id', label: 'Kept in (needed if tracked)', type: 'select', options: [{ value: '', label: '—' }, ...opt(stores)] }, { name: 'revenue_account', label: 'Sales account', type: 'select', options: accounts.filter((a) => a.type === 'income').map((a) => ({ value: a.code, label: a.name })) }, { name: 'cogs_account', label: 'Cost account', type: 'select', options: accounts.filter((a) => a.type === 'cost_of_sales').map((a) => ({ value: a.code, label: a.name })) }], 'Add item', async (v) => { if (await act(() => api('POST', '/items', { name: v.name, unit: v.unit, price: toCents(v.price), tax_rate_bp: Math.round(Number(v.vat) * 100), sellable: v.sellable, stocked: v.stocked, store_id: v.store_id || undefined, revenue_account: v.revenue_account, cogs_account: v.cogs_account }), 'Item added')) pageSetup(m); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'Recipes'), h('p', { class: 'small muted' }, 'A recipe says which raw items, from which store, each sale uses. Stock always leaves the store named here, whichever till rings the sale.'), pickRecipe, recipeBox,
+      form([{ name: 'item_id', label: 'Raw item', type: 'select', options: opt(stocked) }, { name: 'store_id', label: 'From store', type: 'select', options: opt(stores) }, { name: 'qty', label: 'Quantity per sale', type: 'number', step: 'any' }], 'Add to recipe', (v) => { if (!cur) return toast('Choose a menu item first', true); comps.push({ item_id: v.item_id, store_id: v.store_id, qty: Number(v.qty) }); drawRecipe(); }),
+      h('p', {}, h('button', { class: 'btn primary', onclick: async () => { if (!cur) return toast('Choose a menu item first', true); if (await act(() => api('POST', `/items/${cur}/recipe`, { components: comps.map((c) => ({ ...c, qty: String(c.qty) })) }), 'Recipe saved')) await names(); } }, 'Save recipe'))),
+    h('div', { class: 'panel' }, h('h3', {}, 'Add a customer, supplier or staff member'), form([{ name: 'kind', label: 'Type', type: 'select', options: ['customer', 'supplier', 'staff'] }, { name: 'name', label: 'Name' }, { name: 'phone', label: 'Phone' }, { name: 'credit_limit', label: 'Credit limit (KES, customers)', type: 'number', value: 0 }], 'Add', async (v) => { if (await act(() => api('POST', '/parties', { kind: v.kind, name: v.name, phone: v.phone, credit_limit: toCents(v.credit_limit || 0) }), 'Added')) pageSetup(m); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'People who can sign in'), users.length ? h('table', {}, users.map((u) => h('tr', {}, h('td', {}, u.name), h('td', {}, u.role), h('td', {}, u.has_pin ? 'PIN set' : '')))) : '',
+      form([{ name: 'name', label: 'Name' }, { name: 'role', label: 'Role', type: 'select', options: ['waiter', 'cashier', 'storekeeper', 'accountant', 'manager', 'owner'] }, { name: 'email', label: 'Email (to sign in)', type: 'email' }, { name: 'password', label: 'Password (8+)', type: 'password' }, { name: 'pin', label: 'PIN (managers: used to approve)', type: 'password' }], 'Add person', async (v) => { if (await act(() => api('POST', '/users', { ...v, email: v.email || undefined, pin: v.pin || undefined }), 'Person added')) pageSetup(m); })),
+    S.user.role === 'owner' && h('div', { class: 'panel' }, h('h3', {}, 'Lock a period'), h('p', { class: 'small muted' }, 'After locking, nothing can be posted on or before that date. Locks only move forward.'), form([{ name: 'through', label: 'Lock through', type: 'date' }], 'Lock period', async (v) => { await act(() => api('POST', '/periods/lock', v), 'Period locked'); })));
+}
+
+// ---------------------------------------------------------------- printing and bill extras
+function printText(title, text) {
+  const w = window.open('', '_blank', 'width=380,height=640');
+  if (!w) return toast('Allow pop-ups to print', true);
+  w.document.title = title;
+  const pre = w.document.createElement('pre'); pre.textContent = text; pre.style.cssText = 'font:13px/1.3 monospace;width:80mm;margin:0;white-space:pre';
+  w.document.body.style.margin = '4mm'; w.document.body.append(pre); w.focus(); setTimeout(() => w.print(), 200);
+}
+async function printReceipt(id) { const r = await act(() => api('GET', `/bills/${id}/receipt?format=text`)); if (r) printText('Receipt', r.text); }
+function otherPayDialog(b, reload) {
+  const body = form([{ name: 'method', label: 'Pay with', type: 'select', options: [{ value: 'deposit', label: 'Customer deposit' }, { value: 'giftcard', label: 'Gift card' }, { value: 'points', label: 'Loyalty points' }] }, { name: 'amount', label: 'Amount (KES) for deposit or gift card', type: 'number', value: (b.balance / 100).toFixed(2) }, { name: 'code', label: 'Gift card code' }, { name: 'points', label: 'Points to use' }], 'Record payment', async (v) => {
+    const send = v.method === 'points' ? { method: 'points', points: v.points } : v.method === 'giftcard' ? { method: 'giftcard', code: v.code, amount: toCents(v.amount) } : { method: 'deposit', amount: toCents(v.amount) };
+    if (await act(() => api('POST', `/bills/${b.id}/payments`, send, uuid()), 'Payment recorded')) { d.close(); reload(); }
+  });
+  const d = dialog('Other ways to pay', h('div', {}, h('p', { class: 'small muted' }, 'Deposits and points need the customer on the bill.'), body), (close) => [h('button', { class: 'btn', onclick: close }, 'Cancel')]);
+}
+async function refundDialog(b, reload) {
+  const af = await approverFields();
+  const lines = b.lines.filter((l) => l.status === 'active');
+  const body = form([{ name: 'line_id', label: 'Item to refund', type: 'select', options: lines.map((l) => ({ value: l.id, label: `${l.item_name} × ${Number(l.qty)} · ${kes(l.payable)}` })) }, { name: 'method', label: 'Refund by', type: 'select', options: [{ value: 'cash', label: 'Cash' }, { value: 'mpesa', label: 'M-Pesa' }, { value: 'card', label: 'Card' }, { value: 'deposit', label: 'Store credit (needs a customer)' }] }, { name: 'reason', label: 'Reason (required)' }, { name: 'restock', label: 'Put the item back in stock (untouched food or sealed items only)', type: 'checkbox' }, ...af], 'Refund', async (v) => {
+    if (await act(() => api('POST', `/bills/${b.id}/refund`, { line_id: v.line_id, method: v.method, reason: v.reason, restock: v.restock, approver: approverOf(v) }, uuid()), 'Refund recorded')) { d.close(); reload(); }
+  });
+  const d = dialog('Refund an item', h('div', {}, h('p', { class: 'small muted' }, 'A manager must approve. If the item is not put back in stock, its cost is recorded as wastage.'), body), (close) => [h('button', { class: 'btn', onclick: close }, 'Cancel')]);
+}
+
+// ---------------------------------------------------------------- More: owner, hotel, staff, trade, planning, import, settings
+const tbl = (head, rows, empty = 'Nothing here yet.') => rows.length ? h('div', { class: 'scroll' }, h('table', {}, h('tr', {}, head.map((x, i) => h('th', { class: /^(KES|Qty|Amount|Total)/.test(x) ? 'num' : '' }, x))), rows)) : h('p', { class: 'muted' }, empty);
+const td = (v, num) => h('td', { class: num ? 'num' : '' }, v);
+const pct = (bp) => (bp / 100).toString();
+async function pageMore(m, tab) {
+  tab = tab || S.moreTab || (['owner', 'manager', 'accountant'].includes(S.user.role) ? 'today' : 'hotel'); S.moreTab = tab;
+  const owner = ['owner', 'manager', 'accountant'].includes(S.user.role);
+  const all = [['today', 'Today', owner], ['hotel', 'Hotel', true], ['staff', 'Staff and pay', owner], ['trade', 'Trade', owner], ['plan', 'Planning', owner], ['import', 'Import', ['owner', 'manager', 'accountant'].includes(S.user.role)], ['settings', 'Settings', ['owner', 'manager'].includes(S.user.role)], ['billing', 'Plan and billing', owner], ['outlets', 'Outlets', owner]].filter((x) => x[2]);
+  const body = h('div', {});
+  m.replaceChildren(h('h2', {}, 'More'), tabs(all.map(([id, l]) => [id, l]), tab, (t) => pageMore(m, t)), body);
+  await ({ today: moreToday, hotel: moreHotel, staff: moreStaff, trade: moreTrade, plan: morePlan, import: moreImport, settings: moreSettings, billing: moreBilling, outlets: moreOutlets })[tab](body, () => pageMore(m, tab));
+}
+async function moreToday(body) {
+  const s = await api('GET', '/owner/summary?outlet=' + S.outlet);
+  const stat = (label, val, sub) => h('div', { class: 'panel', style: 'flex:1 1 150px;margin:0' }, h('div', { class: 'small muted' }, label), h('div', { style: 'font-size:1.4rem;font-weight:700', class: 'num' }, val), sub && h('div', { class: 'small muted' }, sub));
+  body.append(h('div', { class: 'row', style: 'margin-bottom:1rem' }, stat('Sales today', kes(s.net_sales), `${s.closed_bills} bills · avg ${kes(s.average_bill)}`), stat('Gross profit', kes(s.gross_profit)), stat('Open bills', String(s.open_bills), kes(s.open_bills_value)), stat('Cash per books', kes(s.cash_in_till_per_books), 'M-Pesa ' + kes(s.mpesa_clearing))),
+    h('div', { class: 'panel' }, h('h3', {}, 'Watch'), tbl(['Item', 'KES'], [['Complimentary', s.watch.complimentary], ['Write-offs', s.watch.write_offs], ['Wastage today', s.watch.wastage_today], ['Stock variance today', s.watch.stock_variance_today]].map(([a, v]) => h('tr', {}, td(a), td(kes(v), 1))), ''), h('p', { class: 'small muted' }, `${s.watch.items_removed_today} items removed from bills today · customers owe ${kes(s.customers_owe)} · you owe suppliers ${kes(s.we_owe_suppliers)}`)),
+    h('div', { class: 'panel' }, h('h3', {}, 'Top sellers today'), tbl(['Item', 'Qty', 'Amount'], s.top_items.map((t) => h('tr', {}, td(t.name), td(Number(t.qty), 1), td(kes(t.amount), 1))), 'No sales yet today.')),
+    h('div', { class: 'panel' }, h('h3', {}, 'Needs you'), h('p', {}, `${s.pending_approvals} approval(s) waiting · ${s.low_stock_items} item(s) at reorder level`), s.books.ok ? h('p', { style: 'color:var(--good)' }, 'Books balanced. All checks pass.') : h('p', { style: 'color:var(--bad)' }, 'Books need attention: ' + s.books.failing.map((f) => f.name).join('; '))));
+  const pend = await api('GET', '/approvals?status=pending').catch(() => []);
+  if (pend.length) { const box = h('div', { class: 'panel' }, h('h3', {}, 'Approve in one tap')); for (const a of pend.slice(0, 8)) box.append(h('div', { class: 'row', style: 'align-items:center;margin-bottom:.4rem' }, h('span', {}, `${a.kind.replace('_', ' ')} · ${a.payload.number || ''} · by ${a.requested_by_name}`), h('button', { class: 'btn sm primary fit', onclick: async () => { if (await act(() => api('POST', `/approvals/${a.id}/approve`, {}), 'Approved')) pageMore($('#main'), 'today'); } }, 'Approve'))); body.append(box); }
+}
+async function moreHotel(body, again) {
+  const [types, rooms, res, parties] = await Promise.all([api('GET', '/hotel/room-types'), api('GET', '/hotel/rooms'), api('GET', '/hotel/reservations'), api('GET', '/parties?kind=customer')]);
+  const mgr = ['owner', 'manager'].includes(S.user.role), today = new Date().toISOString().slice(0, 10), tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const chip = (s) => h('span', { class: 'chip ' + ({ clean: 'good', occupied: 'warn', dirty: 'bad', out_of_order: 'bad', maintenance: 'bad' }[s] || '') }, s.replace('_', ' '));
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Rooms'), tbl(['Room', 'Type', 'Status', 'Guest', ''], rooms.map((r) => h('tr', {}, td(r.number), td(r.room_type), td(chip(r.status)), td(r.occupant ? r.occupant.guest : ''), td(r.status === 'dirty' ? h('button', { class: 'btn sm', onclick: async () => { if (await act(() => api('PATCH', `/hotel/rooms/${r.id}/status`, { status: 'clean' }), 'Room is clean')) again(); } }, 'Mark clean') : null))), 'No rooms yet. Add room types and rooms below.')),
+    mgr && h('div', { class: 'panel' }, h('h3', {}, 'Set up rooms'), form([{ name: 'name', label: 'Room type' }, { name: 'rate', label: 'Rate per night (KES, with VAT)', type: 'number' }], 'Add room type', async (v) => { if (await act(() => api('POST', '/hotel/room-types', { name: v.name, rate: toCents(v.rate) }), 'Room type added')) again(); }), h('hr'),
+      form([{ name: 'number', label: 'Room number' }, { name: 'room_type_id', label: 'Type', type: 'select', options: opt(types) }], 'Add room', async (v) => { if (await act(() => api('POST', '/hotel/rooms', v), 'Room added')) again(); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'New reservation'), form([{ name: 'guest_id', label: 'Guest (a customer)', type: 'select', options: opt(parties) }, { name: 'room_type_id', label: 'Room type', type: 'select', options: opt(types) }, { name: 'check_in', label: 'Check-in', type: 'date', value: today }, { name: 'check_out', label: 'Check-out', type: 'date', value: tomorrow }], 'Reserve', async (v) => { if (await act(() => api('POST', '/hotel/reservations', v), 'Reserved')) again(); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'Reservations'), h('div', { class: 'row', style: 'margin-bottom:.5rem' }, h('button', { class: 'btn fit', onclick: async () => { const r = await act(() => api('POST', '/hotel/night-audit'), 'Night audit done'); if (r) toast(`${r.posted} room night(s) posted for ${r.business_date}`); again(); } }, 'Run night audit')),
+      tbl(['No.', 'Guest', 'Room', 'Stay', 'Status', ''], res.slice(0, 40).map((v) => h('tr', {}, td(v.number), td(v.guest), td(v.room_number || v.room_type), td(`${v.check_in} → ${v.check_out}`), td(h('span', { class: 'chip' }, v.status.replace('_', ' '))), td([
+        v.status === 'booked' && h('button', { class: 'btn sm', onclick: () => { const rm = rooms.filter((r) => r.status === 'clean'); const d = dialog('Check in ' + v.guest, form([{ name: 'room_id', label: 'Room', type: 'select', options: rm.map((r) => ({ value: r.id, label: `${r.number} (${r.room_type})` })) }], 'Check in', async (x) => { if (await act(() => api('POST', `/hotel/reservations/${v.id}/check-in`, x), 'Checked in')) { d.close(); again(); } }), (c) => [h('button', { class: 'btn', onclick: c }, 'Cancel')]); } }, 'Check in'), ' ',
+        ['booked', 'checked_in'].includes(v.status) && h('button', { class: 'btn sm', onclick: () => folioDialog(v, again) }, 'Folio')]))), 'No reservations yet.')));
+}
+async function folioDialog(v, again) {
+  const f = await api('GET', `/hotel/reservations/${v.id}`);
+  const af = await approverFields();
+  const d = dialog(`${f.number} · ${f.guest}`, h('div', {}, tbl(['Charge', 'KES'], [...f.charges.map((c) => h('tr', {}, td(c.description), td(kes(c.amount), 1))), ...f.payments.map((p) => h('tr', {}, td('Paid · ' + p.method), td('−' + kes(p.amount), 1)))]), h('p', { style: 'font-weight:700' }, 'Balance ' + kes(f.balance)),
+    f.status === 'checked_in' && h('div', {}, h('h3', {}, 'Add a charge'), form([{ name: 'description', label: 'What for' }, { name: 'amount', label: 'Amount (KES, with VAT)', type: 'number' }], 'Add charge', async (x) => { if (await act(() => api('POST', `/hotel/reservations/${v.id}/charges`, { description: x.description, amount: toCents(x.amount) }), 'Charge added')) { d.close(); folioDialog(v, again); } })),
+    h('h3', { style: 'margin-top:1rem' }, f.status === 'booked' ? 'Take a deposit' : 'Take payment'), form([{ name: 'amount', label: 'Amount (KES)', type: 'number', value: f.balance > 0 ? (f.balance / 100).toFixed(2) : '' }, { name: 'method', label: 'Paid by', type: 'select', options: f.status === 'booked' ? ['cash', 'mpesa', 'card', 'bank'] : ['cash', 'mpesa', 'card', 'bank', 'deposit'] }], 'Record', async (x) => { if (await act(() => api('POST', `/hotel/reservations/${v.id}/payments`, { amount: toCents(x.amount), method: x.method }), 'Recorded')) { d.close(); folioDialog(v, again); } }),
+    f.status === 'checked_in' && h('div', {}, h('h3', { style: 'margin-top:1rem' }, 'Check out'), form(f.balance > 0 ? [{ name: 'transfer', label: 'Move the unpaid balance to the guest’s account (needs a manager)', type: 'checkbox' }, ...af] : [], 'Check out', async (x) => { if (await act(() => api('POST', `/hotel/reservations/${v.id}/check-out`, f.balance > 0 && x.transfer ? { transfer_to_debtors: true, approver: approverOf(x) } : {}), 'Checked out')) { d.close(); again(); } }))),
+    (c) => [h('button', { class: 'btn', onclick: c }, 'Close')]);
+}
+async function moreStaff(body, again) {
+  const [emps, runs, leave, liab] = await Promise.all([api('GET', '/hr/employees'), api('GET', '/payroll/runs').catch(() => []), api('GET', '/hr/leave'), api('GET', '/payroll/liabilities').catch(() => null)]);
+  const canPay = ['owner', 'accountant'].includes(S.user.role);
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Employees'), tbl(['Name', 'KRA PIN', 'Basic', 'Allowances', 'Status'], emps.map((e) => h('tr', {}, td(e.name), td(e.kra_pin || ''), td(kes(e.basic_salary), 1), td(kes(e.allowances), 1), td(e.status)))),
+      form([{ name: 'name', label: 'Name' }, { name: 'kra_pin', label: 'KRA PIN' }, { name: 'nssf_no', label: 'NSSF no.' }, { name: 'sha_no', label: 'SHA no.' }, { name: 'basic', label: 'Basic salary (KES)', type: 'number' }, { name: 'allow', label: 'Allowances (KES)', type: 'number', value: 0 }, { name: 'start_date', label: 'Start date', type: 'date', value: new Date().toISOString().slice(0, 10) }, { name: 'link', label: 'Create a staff account (for bill deductions)', type: 'checkbox', value: true }], 'Add employee', async (v) => { if (await act(() => api('POST', '/hr/employees', { name: v.name, kra_pin: v.kra_pin || undefined, nssf_no: v.nssf_no || undefined, sha_no: v.sha_no || undefined, basic_salary: toCents(v.basic), allowances: toCents(v.allow || 0), start_date: v.start_date, link_staff_account: v.link }), 'Employee added')) again(); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'What would this salary cost?'), h('p', { class: 'small muted' }, 'Uses the statutory rates saved in Settings (PAYE, NSSF, SHIF, housing levy). Rates change: check them with your accountant.'), (() => { const out = h('div', {}); return h('div', {}, form([{ name: 'gross', label: 'Gross monthly pay (KES)', type: 'number' }], 'Calculate', async (v) => { const p = await act(() => api('POST', '/payroll/preview', { gross: toCents(v.gross) })); if (p) out.replaceChildren(tbl(['', 'KES'], [['Gross', p.gross], ['NSSF', -p.nssf_ee], ['SHIF', -p.shif], ['Housing levy', -p.housing_ee], ['PAYE', -p.paye], ['Net pay', p.net], ['Employer cost (incl. NSSF and housing levy)', p.employer_cost]].map(([a, x]) => h('tr', {}, td(a), td(kes(x), 1))))); }), out); })()),
+    canPay && h('div', { class: 'panel' }, h('h3', {}, 'Payroll'), form([{ name: 'period', label: 'Month (YYYY-MM)', placeholder: new Date().toISOString().slice(0, 7) }, { name: 'recover', label: 'Recover what staff owe from bill deductions (up to half of take-home)', type: 'checkbox' }], 'Run payroll', async (v) => { if (await act(() => api('POST', '/payroll/runs', { period: v.period, recover_staff_debt: v.recover }), 'Payroll posted')) again(); }),
+      tbl(['Month', 'Gross', 'Net', 'Paid', ''], runs.map((r) => h('tr', {}, td(r.period), td(kes(r.gross), 1), td(kes(r.net), 1), td(kes(r.paid), 1), td(r.paid < r.net && h('button', { class: 'btn sm', onclick: async () => { if (await act(() => api('POST', `/payroll/runs/${r.id}/pay`, { method: 'bank' }), 'Salaries paid')) again(); } }, 'Pay salaries')))), 'No payroll yet.'),
+      liab && tbl(['Owed to', 'KES', ''], ['PAYE', 'NSSF', 'SHIF', 'AHL'].map((k) => h('tr', {}, td({ PAYE: 'KRA (PAYE)', NSSF: 'NSSF', SHIF: 'SHA (SHIF)', AHL: 'Housing levy' }[k]), td(kes(liab[k]), 1), td(liab[k] > 0 && h('button', { class: 'btn sm', onclick: async () => { if (await act(() => api('POST', '/payroll/remit', { liability: k, amount: liab[k], method: 'bank' }), 'Remittance recorded')) again(); } }, 'Record remittance')))))),
+    h('div', { class: 'panel' }, h('h3', {}, 'Leave'), form([{ name: 'employee_id', label: 'Employee', type: 'select', options: opt(emps) }, { name: 'start_date', label: 'From', type: 'date' }, { name: 'end_date', label: 'To', type: 'date' }, { name: 'days', label: 'Working days', type: 'number' }], 'Request leave', async (v) => { if (await act(() => api('POST', '/hr/leave', v), 'Sent for approval')) again(); }),
+      tbl(['Employee', 'Dates', 'Days', 'Status'], leave.map((l) => h('tr', {}, td(l.employee), td(`${l.start_date} → ${l.end_date}`), td(Number(l.days), 1), td(h('span', { class: 'chip ' + (l.status === 'approved' ? 'good' : l.status === 'rejected' ? 'bad' : 'warn') }, l.status)))), 'No leave requests.')));
+}
+async function moreTrade(body, again) {
+  const { items, parties } = await names();
+  const [pls, promos, orders, ag] = await Promise.all([api('GET', '/price-lists'), api('GET', '/promotions'), api('GET', '/orders'), api('GET', '/reports/ageing')]);
+  const cust = parties.filter((p) => p.kind === 'customer'), sell = items.filter((i) => i.is_sellable), mgr = ['owner', 'manager'].includes(S.user.role);
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Who owes you, and for how long'), tbl(['Customer', 'Current', '31–60', '61–90', '90+', 'Total'], ag.customers.map((c) => h('tr', {}, td(c.name), td(kes(c.current), 1), td(kes(c.d31_60), 1), td(kes(c.d61_90), 1), td(kes(c.d90_plus), 1), td(kes(c.total), 1))), 'Nobody owes anything.'), h('p', { class: 'small muted' }, 'Payments are matched to the oldest invoices first.')),
+    h('div', { class: 'panel' }, h('h3', {}, 'Customer statement'), form([{ name: 'id', label: 'Customer', type: 'select', options: opt(cust) }], 'Show statement', async (v) => { const s = await act(() => api('GET', `/customers/${v.id}/statement`)); if (s) dialog('Statement · ' + s.customer.name, tbl(['Date', 'What', 'Debit', 'Credit', 'Balance'], s.lines.map((l) => h('tr', {}, td(l.date), td(l.memo || l.source_type), td(l.debit ? kes(l.debit) : '', 1), td(l.credit ? kes(l.credit) : '', 1), td(kes(l.balance), 1)))), (c) => [h('button', { class: 'btn', onclick: c }, 'Close')]); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'Sales orders (wholesale)'), form([{ name: 'customer_id', label: 'Customer', type: 'select', options: opt(cust) }, { name: 'item_id', label: 'Item', type: 'select', options: opt(sell) }, { name: 'qty', label: 'Quantity', type: 'number', step: 'any' }], 'Create order', async (v) => { if (await act(() => api('POST', '/orders', { customer_id: v.customer_id, lines: [{ item_id: v.item_id, qty: v.qty }] }), 'Order created')) again(); }),
+      tbl(['Order', 'Customer', 'Status', ''], orders.map((o) => h('tr', {}, td(o.number), td(o.customer), td(o.status), td(o.status === 'open' && h('button', { class: 'btn sm primary', onclick: async () => { const af = await approverFields(); const d = dialog('Deliver ' + o.number, h('div', {}, h('p', { class: 'small muted' }, 'Delivery takes the stock out and raises a credit invoice. A manager PIN is needed if it goes over the customer’s credit limit.'), form(af, 'Deliver and invoice', async (v) => { if (await act(() => api('POST', `/orders/${o.id}/deliver`, { approver: v.pin ? approverOf(v) : undefined }), 'Delivered and invoiced')) { d.close(); again(); } })), (c) => [h('button', { class: 'btn', onclick: c }, 'Cancel')]); } }, 'Deliver')))), 'No orders yet.')),
+    mgr && h('div', { class: 'panel' }, h('h3', {}, 'Price lists'), tbl(['List', 'Items', 'Customers'], pls.map((p) => h('tr', {}, td(p.name), td(p.items, 1), td(p.customers, 1))), 'No price lists yet.'),
+      form([{ name: 'name', label: 'New price list' }], 'Create', async (v) => { if (await act(() => api('POST', '/price-lists', v), 'Created')) again(); }), h('hr'),
+      pls.length ? form([{ name: 'id', label: 'List', type: 'select', options: opt(pls) }, { name: 'item_id', label: 'Item', type: 'select', options: opt(sell) }, { name: 'price', label: 'Price (KES, with VAT)', type: 'number', step: '0.01' }], 'Set price', async (v) => { await act(() => api('POST', `/price-lists/${v.id}/items`, { item_id: v.item_id, price: toCents(v.price) }), 'Price saved'); }) : '', h('hr'),
+      pls.length ? form([{ name: 'customer', label: 'Customer', type: 'select', options: opt(cust) }, { name: 'price_list_id', label: 'Price list', type: 'select', options: [{ value: '', label: 'None' }, ...opt(pls)] }, { name: 'terms_days', label: 'Payment terms (days)', type: 'number', value: 30 }], 'Assign to customer', async (v) => { await act(() => api('POST', `/customers/${v.customer}/price-list`, { price_list_id: v.price_list_id || null, terms_days: Number(v.terms_days) }), 'Assigned'); }) : ''),
+    mgr && h('div', { class: 'panel' }, h('h3', {}, 'Promotions'), h('p', { class: 'small muted' }, 'Applied automatically at the till, shown as a discount. Only managers can give other discounts.'),
+      tbl(['Promotion', 'Item', 'Off', 'Dates', ''], promos.map((p) => h('tr', {}, td(p.name), td(p.item || 'Everything'), td(pct(p.percent_bp) + '%'), td(`${p.starts || 'now'} → ${p.ends || 'open'}`), td(h('button', { class: 'btn sm', onclick: async () => { if (await act(() => api('POST', `/promotions/${p.id}/active`, { active: !p.active }), 'Updated')) again(); } }, p.active ? 'Stop' : 'Start')))), 'No promotions.'),
+      form([{ name: 'name', label: 'Name' }, { name: 'item_id', label: 'Item', type: 'select', options: [{ value: '', label: 'Everything' }, ...opt(sell)] }, { name: 'percent', label: 'Percent off', type: 'number', value: 10 }, { name: 'starts', label: 'From', type: 'date' }, { name: 'ends', label: 'To', type: 'date' }], 'Add promotion', async (v) => { if (await act(() => api('POST', '/promotions', { name: v.name, item_id: v.item_id || undefined, percent_bp: Math.round(Number(v.percent) * 100), starts: v.starts || undefined, ends: v.ends || undefined }), 'Promotion added')) again(); })));
+}
+async function morePlan(body) {
+  const [f, ro, low] = await Promise.all([api('GET', '/forecast?days=7'), api('GET', '/forecast/reorder').catch(() => ({ items: [], basis: '' })), api('GET', '/reports/low-stock').catch(() => [])]);
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Expected sales, next 7 days'), h('p', { class: 'small muted' }, f.basis + '. A baseline to plan with, not a promise.'), tbl(['Item', 'Qty'], f.items.slice(0, 15).map((i) => h('tr', {}, td(i.name), td(i.total, 1))), 'Not enough sales history yet.')),
+    h('div', { class: 'panel' }, h('h3', {}, 'What to order'), h('p', { class: 'small muted' }, ro.basis), tbl(['Item', 'On hand', 'Daily use', 'Days left', 'Order'], ro.items.map((i) => h('tr', {}, td(i.name), td(i.on_hand + ' ' + i.unit, 1), td(i.daily_use, 1), td(i.days_of_cover ?? '–', 1), td(h('b', {}, i.suggested_order), 1))), 'Nothing needs ordering.')),
+    h('div', { class: 'panel' }, h('h3', {}, 'At or below reorder level'), tbl(['Item', 'On hand', 'Reorder at'], low.map((i) => h('tr', {}, td(i.name), td(Number(i.on_hand), 1), td(Number(i.reorder_level), 1))), 'Nothing is low. Set reorder levels on items to get alerts.')));
+}
+function moreImport(body) {
+  const mk = (title, hint, url, example) => {
+    const ta = h('textarea', { rows: 6, placeholder: example, style: 'font-family:monospace' }), out = h('div', {});
+    const file = h('input', { type: 'file', accept: '.csv,text/csv', onchange: (e) => { const f = e.target.files[0]; if (f) f.text().then((t) => (ta.value = t)); } });
+    const run = (dry) => async () => { if (!ta.value.trim()) return toast('Paste or choose a CSV file first', true); const r = await act(() => api('POST', url, { csv: ta.value, dry_run: dry })); if (r) out.replaceChildren(h('p', {}, h('b', {}, `${r.dry_run ? 'Check only: ' : ''}${r.created} ${r.dry_run ? 'would be added' : 'added'}, ${r.skipped} already there, ${r.errors.length} problem(s)`)), h('p', { class: 'small muted' }, 'Columns understood: ' + r.columns_recognised.join(', ') + (r.columns_ignored.length ? ' · ignored: ' + r.columns_ignored.join(', ') : '')), r.errors.length ? tbl(['Row', 'Problem'], r.errors.map((e) => h('tr', {}, td(e.row || '–'), td(e.message)))) : ''); };
+    return h('div', { class: 'panel' }, h('h3', {}, title), h('p', { class: 'small muted' }, hint), file, ta, h('div', { class: 'row', style: 'margin-top:.5rem' }, h('button', { class: 'btn', onclick: run(true) }, 'Check first'), h('button', { class: 'btn primary', onclick: run(false) }, 'Import')), out);
+  };
+  body.append(h('p', { class: 'muted' }, 'Bring your list from another system or a spreadsheet. Always press Check first: nothing is saved until you press Import. Importing twice is safe, existing items are skipped.'),
+    mk('Items and prices', 'Needs a name. Understands columns such as name, price, cost, unit, category, barcode and store.', '/import/items', 'Name,Selling Price,Buying Price,Unit,Store\nTusker Lager,300,220,bottle,Bar'),
+    mk('Customers, suppliers, staff', 'Needs a name. Optional: type, phone, credit limit.', '/import/parties', 'Name,Type,Phone,Credit Limit\nAcme Ltd,customer,0711000000,50000'),
+    mk('Opening stock', 'Import items first. One bad row stops the whole import so stock is never half-loaded.', '/import/opening-stock', 'Item,Quantity,Cost\nTusker Lager,48,220'));
+}
+async function moreSettings(body, again) {
+  const s = await api('GET', '/settings'), notes = await api('GET', '/notifications').catch(() => []);
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Business and receipts'), form([{ name: 'business_name', label: 'Business name', value: s.business_name || '' }, { name: 'business_address', label: 'Address', value: s.business_address || '' }, { name: 'business_phone', label: 'Phone', value: s.business_phone || '' }, { name: 'kra_pin', label: 'KRA PIN', value: s.kra_pin || '' }, { name: 'receipt_footer', label: 'Receipt footer', value: s.receipt_footer || '' }], 'Save', async (v) => { await act(() => api('POST', '/settings', v), 'Saved'); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'Tax, charges and rewards'), h('p', { class: 'small muted' }, 'The tourism/catering levy is taken out of your VAT-inclusive prices. Ask your accountant whether it applies to you and at what rate (it is 2% for many tourism businesses).'), form([{ name: 'levy', label: 'Tourism / catering levy %', type: 'number', step: '0.01', value: pct(Number(s.levy_bp || 0)) }, { name: 'svc', label: 'Default service charge %', type: 'number', step: '0.01', value: pct(Number(s.service_charge_bp || 0)) }, { name: 'loy', label: 'Loyalty points on', type: 'checkbox', value: s.loyalty_enabled === 'true' }, { name: 'earn', label: 'Points earned per KES 100 paid', type: 'number', value: s.loyalty_points_per_kes100 || 1 }, { name: 'pv', label: 'Value of one point (KES)', type: 'number', step: '0.01', value: (Number(s.loyalty_point_value_cents || 100) / 100) }], 'Save', async (v) => { await act(() => api('POST', '/settings', { levy_bp: Math.round(Number(v.levy) * 100), service_charge_bp: Math.round(Number(v.svc) * 100), loyalty_enabled: String(v.loy), loyalty_points_per_kes100: v.earn, loyalty_point_value_cents: Math.round(Number(v.pv) * 100) }), 'Saved'); })),
+    h('div', { class: 'panel' }, h('h3', {}, 'Nightly report to your phone'), h('p', { class: 'small muted' }, 'Each evening Mizani sends one short message: sales, takings, anything unusual, and whether the books balance. Paste the web address your messaging service (for example a WhatsApp provider) gives you. It must start with https://.'),
+      form([{ name: 'digest', label: 'Send the nightly report', type: 'checkbox', value: s.digest_enabled === 'true' }, { name: 'hour', label: 'Hour (0–23, Nairobi time)', type: 'number', value: s.digest_hour || 21 }, { name: 'url', label: 'Notification address', value: s.webhook_url || '' }], 'Save', async (v) => { await act(() => api('POST', '/settings', { digest_enabled: String(v.digest), digest_hour: v.hour, webhook_url: v.url }), 'Saved'); }),
+      h('p', { style: 'margin-top:.6rem' }, h('button', { class: 'btn', onclick: async () => { const r = await act(() => api('POST', '/owner/digest/send')); if (r) { dialog('Today’s report: ' + r.status, h('pre', { style: 'white-space:pre-wrap' }, r.text + (r.detail ? '\n\n' + r.detail : '')), (c) => [h('button', { class: 'btn', onclick: c }, 'Close')]); again(); } } }, 'Send one now')),
+      tbl(['When', 'Kind', 'Result'], notes.slice(0, 8).map((n) => h('tr', {}, td(new Date(n.created_at).toLocaleString()), td(n.kind), td(n.status + (n.detail ? ' · ' + n.detail : '')))), 'Nothing sent yet.')));
+}
+async function moreBilling(body) {
+  const b = await api('GET', '/billing');
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Your plan'), h('p', {}, b.subscription ? `${b.subscription.plan} · ${b.subscription.outlets} outlet(s)` : 'No plan on record'), h('p', {}, h('span', { class: 'chip ' + (b.access.writable ? 'good' : 'bad') }, b.access.status.replace('_', ' ')), ' ', b.access.message || ''),
+    h('p', { class: 'small muted' }, 'If a payment is overdue, Mizani becomes read-only: you can always see and export your data, but not make changes. Contact your provider to pay or change plan.')),
+    h('div', { class: 'panel' }, h('h3', {}, 'Invoices'), tbl(['No.', 'Period', 'Amount', 'Status', 'Due'], b.invoices.map((i) => h('tr', {}, td(i.number), td(`${i.period_start} → ${i.period_end}`), td(kes(i.amount), 1), td(h('span', { class: 'chip ' + (i.status === 'paid' ? 'good' : 'warn') }, i.status)), td(i.due_date))), 'No invoices yet.')));
+}
+async function moreOutlets(body, again) {
+  const [outs, stores, rep] = await Promise.all([api('GET', '/outlets'), api('GET', '/stores'), api('GET', '/reports/outlets')]);
+  body.append(h('div', { class: 'panel' }, h('h3', {}, 'Sales by outlet'), tbl(['Outlet', 'Revenue', 'Cost of sales', 'Gross profit'], rep.map((r) => h('tr', {}, td(r.name), td(kes(r.revenue), 1), td(kes(r.cost_of_sales), 1), td(kes(r.gross_profit), 1)))), h('p', { class: 'small muted' }, 'Rent, salaries and other shared costs are reported for the whole business, not split by outlet.')),
+    S.user.role === 'owner' && h('div', { class: 'panel' }, h('h3', {}, 'Outlets'), tbl(['Outlet', 'Stores'], outs.map((o) => h('tr', {}, td(o.name), td(o.stores, 1)))), form([{ name: 'name', label: 'New outlet (branch)' }], 'Add outlet', async (v) => { if (await act(() => api('POST', '/outlets', v), 'Outlet added')) { await loadOutlets(); again(); } }), h('hr'),
+      form([{ name: 'id', label: 'Store', type: 'select', options: opt(stores) }, { name: 'outlet_id', label: 'Belongs to', type: 'select', options: opt(outs) }], 'Move store', async (v) => { if (await act(() => api('PATCH', `/stores/${v.id}`, { outlet_id: v.outlet_id }), 'Store moved')) again(); })),
+    h('p', { class: 'muted' }, 'Use the outlet picker at the top of the page to see one outlet’s bills, stock and today’s numbers.'));
+}
+// ---------------------------------------------------------------- free books health check (before sign-in)
+function healthCheckView() {
+  const out = h('div', {}), files = {};
+  const pick = (key, label, hint) => h('div', {}, h('label', {}, `${label} (CSV)`), h('input', { type: 'file', accept: '.csv,text/csv', onchange: (e) => { const f = e.target.files[0]; if (f) f.text().then((t) => (files[key] = t)); } }), h('div', { class: 'small muted' }, hint));
+  return h('div', { class: 'panel' }, h('h3', {}, 'Free books health check'), h('p', { class: 'small muted' }, 'Export any of these from your current system and see what is leaking. No account needed. Your files are read in memory and not stored.'),
+    pick('trial_balance', 'Trial balance', 'Columns: account, debit, credit'), pick('stock', 'Stock report', 'Columns: item, quantity, value (or cost)'), pick('bills', 'Bills list', 'Columns: status, total, paid, date, discount'),
+    h('p', { style: 'margin-top:.8rem' }, h('button', { class: 'btn primary', onclick: async () => { try { const r = await api('POST', '/health-check', files); out.replaceChildren(h('h3', {}, `Score ${r.score}/100 · ${r.grade}`), h('p', {}, r.summary), ...r.findings.map((f) => h('div', { class: 'panel', style: 'margin-bottom:.5rem' }, h('span', { class: 'chip ' + (f.severity === 'high' ? 'bad' : f.severity === 'medium' ? 'warn' : '') }, f.severity), ' ', h('b', {}, f.title), h('div', { class: 'small' }, f.detail), f.prevents && h('div', { class: 'small', style: 'color:var(--good)' }, 'Mizani: ' + f.prevents))), h('p', { class: 'small muted' }, r.privacy)); } catch (e) { toast(e.message, true); } } }, 'Check my books')), out);
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+// ---------------------------------------------------------------- boot
+try { const s = JSON.parse(localStorage.getItem('mz') || 'null'); if (s && s.token) { S.token = s.token; S.business = s.business; S.user = s.user; } } catch (e) {}
+render();
+setInterval(refreshHealth, 30000);
+</script>
+</body>
+</html>

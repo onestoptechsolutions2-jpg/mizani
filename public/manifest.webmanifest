@@ -1,0 +1,10 @@
+{
+  "name": "Mizani",
+  "short_name": "Mizani",
+  "description": "Restaurant, bar and hotel books that always balance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f4f9",
+  "theme_color": "#2a47d1",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,0 +1,68 @@
+# Mizani: one command to run the whole product.
+#   cp .env.example .env   (edit the secrets)
+#   docker compose up -d --build
+#   open http://localhost:3000
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # Trading days follow Nairobi time, not UTC.
+    command: ["postgres", "-c", "timezone=Africa/Nairobi", "-c", "log_timezone=Africa/Nairobi"]
+    environment:
+      TZ: Africa/Nairobi
+      POSTGRES_USER: ${PGUSER:-mizani}
+      POSTGRES_PASSWORD: ${PGPASSWORD:?Set PGPASSWORD in .env}
+      POSTGRES_DB: mizani_control
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-mizani} -d mizani_control"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # The database is not published to the host. Only the api and backup services can reach it.
+
+  api:
+    build: { context: ., target: runtime }
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment: &appenv
+      NODE_ENV: production
+      PGHOST: db
+      PGUSER: ${PGUSER:-mizani}
+      PGPASSWORD: ${PGPASSWORD:?Set PGPASSWORD in .env}
+      CONTROL_DB: mizani_control
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      PLATFORM_ADMIN_TOKEN: ${PLATFORM_ADMIN_TOKEN:-}
+      ALLOW_SIGNUP: ${ALLOW_SIGNUP:-true}
+      PORT: 3000
+    ports:
+      - "${PORT:-3000}:3000"
+
+  backup:
+    build: { context: ., target: runtime }
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    command: ["node", "dist/cli.js", "backup-loop"]
+    environment:
+      <<: *appenv
+      BACKUP_DIR: /backups
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backups:/backups
+
+  # docker compose --profile test run --rm test
+  test:
+    profiles: ["test"]
+    build: { context: ., target: build }
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      <<: *appenv
+      NODE_ENV: test
+    command: ["npm", "test"]
+
+volumes:
+  pgdata:

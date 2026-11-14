@@ -1,0 +1,400 @@
+
+> mizani@0.1.0 test
+> node --import tsx --test --test-concurrency=1 test/*.test.ts
+
+TAP version 13
+# Subtest: AT-01 stock-take GAIN has a credit side (Zikis audit issue 1)
+ok 1 - AT-01 stock-take GAIN has a credit side (Zikis audit issue 1)
+  ---
+  duration_ms: 3013.881488
+  type: 'test'
+  ...
+# Subtest: AT-02 stock-take loss posts Dr variance / Cr Inventory
+ok 2 - AT-02 stock-take loss posts Dr variance / Cr Inventory
+  ---
+  duration_ms: 449.828741
+  type: 'test'
+  ...
+# Subtest: AT-03 the counter cannot approve their own count
+ok 3 - AT-03 the counter cannot approve their own count
+  ---
+  duration_ms: 419.553094
+  type: 'test'
+  ...
+# Subtest: AT-04 counts are blind: the counter never sees system quantity
+ok 4 - AT-04 counts are blind: the counter never sees system quantity
+  ---
+  duration_ms: 383.360399
+  type: 'test'
+  ...
+# Subtest: AT-25 stock takes cover every item mapped to the store, with a system quantity (audit: coverage)
+ok 5 - AT-25 stock takes cover every item mapped to the store, with a system quantity (audit: coverage)
+  ---
+  duration_ms: 387.316163
+  type: 'test'
+  ...
+# Subtest: AT-05/06 open bill posts revenue per line; payment clears Open Bills (audit issue 2)
+ok 6 - AT-05/06 open bill posts revenue per line; payment clears Open Bills (audit issue 2)
+  ---
+  duration_ms: 448.789967
+  type: 'test'
+  ...
+# Subtest: AT-07 evening bill paid after midnight stays in one business day
+ok 7 - AT-07 evening bill paid after midnight stays in one business day
+  ---
+  duration_ms: 378.762566
+  type: 'test'
+  ...
+# Subtest: AT-08 line to 0 then re-added twice leaves only the final lines (bill J30i0L4IW5HV)
+ok 8 - AT-08 line to 0 then re-added twice leaves only the final lines (bill J30i0L4IW5HV)
+  ---
+  duration_ms: 383.2855
+  type: 'test'
+  ...
+# Subtest: AT-09 beef leaves the recipe store, never the terminal store (bills J02iH0T748R9, J30iZFUP9EHL)
+ok 9 - AT-09 beef leaves the recipe store, never the terminal store (bills J02iH0T748R9, J30iZFUP9EHL)
+  ---
+  duration_ms: 375.28921
+  type: 'test'
+  ...
+# Subtest: AT-10 same through the offline sync path (offline sync is not built yet)
+ok 10 - AT-10 same through the offline sync path (offline sync is not built yet) # TODO
+  ---
+  duration_ms: 0.394512
+  type: 'test'
+  ...
+# Subtest: AT-11 removing an item before the kitchen prepares it restores stock and reverses revenue
+ok 11 - AT-11 removing an item before the kitchen prepares it restores stock and reverses revenue
+  ---
+  duration_ms: 372.509461
+  type: 'test'
+  ...
+# Subtest: AT-12 removing a prepared item reverses revenue, moves cost to Wastage, keeps stock out
+ok 12 - AT-12 removing a prepared item reverses revenue, moves cost to Wastage, keeps stock out
+  ---
+  duration_ms: 533.802302
+  type: 'test'
+  ...
+# Subtest: AT-13 staff deduction posts to Staff Debtors; repayment clears it (audit item 4)
+ok 13 - AT-13 staff deduction posts to Staff Debtors; repayment clears it (audit item 4)
+  ---
+  duration_ms: 493.190163
+  type: 'test'
+  ...
+# Subtest: AT-14/15 complimentary needs a reason and a different approver
+ok 14 - AT-14/15 complimentary needs a reason and a different approver
+  ---
+  duration_ms: 465.807704
+  type: 'test'
+  ...
+# Subtest: AT-16 credit sales respect the customer limit
+ok 15 - AT-16 credit sales respect the customer limit
+  ---
+  duration_ms: 469.409495
+  type: 'test'
+  ...
+# Subtest: AT-17 non-stock purchases post to asset/expense, not Inventory (audit issue 3)
+ok 16 - AT-17 non-stock purchases post to asset/expense, not Inventory (audit issue 3)
+  ---
+  duration_ms: 352.677771
+  type: 'test'
+  ...
+# Subtest: AT-18 one price per purchase line: payable always equals the lines (audit issue 3)
+ok 17 - AT-18 one price per purchase line: payable always equals the lines (audit issue 3)
+  ---
+  duration_ms: 382.425708
+  type: 'test'
+  ...
+# Subtest: AT-19 purchases post on the delivery date, not the keying date
+ok 18 - AT-19 purchases post on the delivery date, not the keying date
+  ---
+  duration_ms: 388.346667
+  type: 'test'
+  ...
+# Subtest: AT-20 supplier payment needs a mode and reduces the supplier balance
+ok 19 - AT-20 supplier payment needs a mode and reduces the supplier balance
+  ---
+  duration_ms: 377.841572
+  type: 'test'
+  ...
+# Subtest: AT-26 unit conversion is exact: 2 cartons of 24, sell 3 singles
+ok 20 - AT-26 unit conversion is exact: 2 cartons of 24, sell 3 singles
+  ---
+  duration_ms: 378.367165
+  type: 'test'
+  ...
+# Subtest: AT-21 double-clicking wastage posts once (audit: wastage entry)
+ok 21 - AT-21 double-clicking wastage posts once (audit: wastage entry)
+  ---
+  duration_ms: 387.051249
+  type: 'test'
+  ...
+# Subtest: AT-22 wastage keeps exact quantity, needs a listed reason, flags backdating
+ok 22 - AT-22 wastage keeps exact quantity, needs a listed reason, flags backdating
+  ---
+  duration_ms: 427.554053
+  type: 'test'
+  ...
+# Subtest: Stock transfers and consumables post balanced entries
+ok 23 - Stock transfers and consumables post balanced entries
+  ---
+  duration_ms: 404.753828
+  type: 'test'
+  ...
+# Subtest: AT-23 the database rejects one-sided, unbalanced and empty journals
+ok 24 - AT-23 the database rejects one-sided, unbalanced and empty journals
+  ---
+  duration_ms: 558.275569
+  type: 'test'
+  ...
+# Subtest: AT-24 the ledger is append-only and stock balances are derived only
+ok 25 - AT-24 the ledger is append-only and stock balances are derived only
+  ---
+  duration_ms: 587.683241
+  type: 'test'
+  ...
+# Subtest: AT-28 trial balance respects the chosen date range (audit: filter ignored)
+ok 26 - AT-28 trial balance respects the chosen date range (audit: filter ignored)
+  ---
+  duration_ms: 495.675183
+  type: 'test'
+  ...
+# Subtest: AT-32 locked periods reject postings; locks only move forward
+ok 27 - AT-32 locked periods reject postings; locks only move forward
+  ---
+  duration_ms: 394.596482
+  type: 'test'
+  ...
+# Subtest: AT-33 replaying a command with the same key posts nothing twice
+ok 28 - AT-33 replaying a command with the same key posts nothing twice
+  ---
+  duration_ms: 395.425225
+  type: 'test'
+  ...
+# Subtest: AT-31 cash count variance posts to Cash over/short; banking moves cash to bank
+ok 29 - AT-31 cash count variance posts to Cash over/short; banking moves cash to bank
+  ---
+  duration_ms: 406.417238
+  type: 'test'
+  ...
+# Subtest: AT-29 the day cannot close with open bills or pending approvals
+ok 30 - AT-29 the day cannot close with open bills or pending approvals
+  ---
+  duration_ms: 420.986473
+  type: 'test'
+  ...
+# Subtest: Opening balances post once, balanced against Opening Balance Equity; expenses need a mode
+ok 31 - Opening balances post once, balanced against Opening Balance Equity; expenses need a mode
+  ---
+  duration_ms: 430.134922
+  type: 'test'
+  ...
+# Subtest: Every client has its own database; data never crosses
+ok 32 - Every client has its own database; data never crosses
+  ---
+  duration_ms: 721.956482
+  type: 'test'
+  ...
+# Subtest: Self-serve signup, login, roles and rate limits
+ok 33 - Self-serve signup, login, roles and rate limits
+  ---
+  duration_ms: 651.820822
+  type: 'test'
+  ...
+# Subtest: Roles: a waiter cannot see reports, approve, or change setup
+ok 34 - Roles: a waiter cannot see reports, approve, or change setup
+  ---
+  duration_ms: 382.149157
+  type: 'test'
+  ...
+# Subtest: F-01 refund after payment reverses revenue; cost goes to wastage unless restocked
+ok 35 - F-01 refund after payment reverses revenue; cost goes to wastage unless restocked
+  ---
+  duration_ms: 812.604813
+  type: 'test'
+  ...
+# Subtest: F-02 refund to store credit lands in the customer deposit account
+ok 36 - F-02 refund to store credit lands in the customer deposit account
+  ---
+  duration_ms: 445.78043
+  type: 'test'
+  ...
+# Subtest: F-03 purchase return: credits Inventory and VAT input at original cost, reduces what is owed
+ok 37 - F-03 purchase return: credits Inventory and VAT input at original cost, reduces what is owed
+  ---
+  duration_ms: 406.700512
+  type: 'test'
+  ...
+# Subtest: F-04 tips are held for staff, not booked as revenue, and paid out
+ok 38 - F-04 tips are held for staff, not booked as revenue, and paid out
+  ---
+  duration_ms: 428.746412
+  type: 'test'
+  ...
+# Subtest: F-05 service charge is held as a liability; re-applying replaces it
+ok 39 - F-05 service charge is held as a liability; re-applying replaces it
+  ---
+  duration_ms: 430.33223
+  type: 'test'
+  ...
+# Subtest: F-05b voiding a bill that has a service charge reverses the charge too (found by the soak test)
+ok 40 - F-05b voiding a bill that has a service charge reverses the charge too (found by the soak test)
+  ---
+  duration_ms: 446.759801
+  type: 'test'
+  ...
+# Subtest: F-06 deposits and gift cards are liabilities that settle bills
+ok 41 - F-06 deposits and gift cards are liabilities that settle bills
+  ---
+  duration_ms: 474.358256
+  type: 'test'
+  ...
+# Subtest: F-07 loyalty points accrue on paid money and redeem as payment
+ok 42 - F-07 loyalty points accrue on paid money and redeem as payment
+  ---
+  duration_ms: 446.996649
+  type: 'test'
+  ...
+# Subtest: F-08 tourism/catering levy is carved out of the VAT-inclusive price and reverses with the line
+ok 43 - F-08 tourism/catering levy is carved out of the VAT-inclusive price and reverses with the line
+  ---
+  duration_ms: 417.137252
+  type: 'test'
+  ...
+# Subtest: F-09 prep production converts raw items into a prepared item at cost, net zero on Inventory
+ok 44 - F-09 prep production converts raw items into a prepared item at cost, net zero on Inventory
+  ---
+  duration_ms: 382.045927
+  type: 'test'
+  ...
+# Subtest: F-10 staff meals are charged to Staff meals, not lost
+ok 45 - F-10 staff meals are charged to Staff meals, not lost
+  ---
+  duration_ms: 414.566031
+  type: 'test'
+  ...
+# Subtest: F-11 depreciation: straight line, once per period, catches up, matches the register
+ok 46 - F-11 depreciation: straight line, once per period, catches up, matches the register
+  ---
+  duration_ms: 393.891929
+  type: 'test'
+  ...
+# Subtest: F-12 receipts and kitchen tickets: text, ESC/POS bytes, no duplicate orders on reprint
+ok 47 - F-12 receipts and kitchen tickets: text, ESC/POS bytes, no duplicate orders on reprint
+  ---
+  duration_ms: 389.55623
+  type: 'test'
+  ...
+# Subtest: F-13 hotel: booking, deposit, check-in, night audit, folio charges, checkout, housekeeping
+ok 48 - F-13 hotel: booking, deposit, check-in, night audit, folio charges, checkout, housekeeping
+  ---
+  duration_ms: 399.102702
+  type: 'test'
+  ...
+# Subtest: F-13b hotel: restaurant bill charged to room, and unpaid folio moved to the guest account with approval
+ok 49 - F-13b hotel: restaurant bill charged to room, and unpaid folio moved to the guest account with approval
+  ---
+  duration_ms: 452.094898
+  type: 'test'
+  ...
+# Subtest: F-14a payroll maths matches hand-worked Kenyan figures (rates verified Nov 2026)
+ok 50 - F-14a payroll maths matches hand-worked Kenyan figures (rates verified Nov 2026)
+  ---
+  duration_ms: 0.721791
+  type: 'test'
+  ...
+# Subtest: F-14b payroll run posts balanced entries, pays net, remits to authorities, recovers staff debts
+ok 51 - F-14b payroll run posts balanced entries, pays net, remits to authorities, recovers staff debts
+  ---
+  duration_ms: 634.509686
+  type: 'test'
+  ...
+# Subtest: F-15 leave accrues 1.75 days a month; requests need approval by someone else
+ok 52 - F-15 leave accrues 1.75 days a month; requests need approval by someone else
+  ---
+  duration_ms: 364.552357
+  type: 'test'
+  ...
+# Subtest: F-16 retail: barcode lookup, reorder alerts, automatic promotions visible in discounts
+ok 53 - F-16 retail: barcode lookup, reorder alerts, automatic promotions visible in discounts
+  ---
+  duration_ms: 484.421646
+  type: 'test'
+  ...
+# Subtest: F-17 wholesale: price lists, statements, FIFO ageing, orders delivered as credit invoices
+ok 54 - F-17 wholesale: price lists, statements, FIFO ageing, orders delivered as credit invoices
+  ---
+  duration_ms: 480.242122
+  type: 'test'
+  ...
+# Subtest: F-18 CSV import: dry run first, tolerant of other systems’ column names, idempotent, all-or-nothing for stock
+ok 55 - F-18 CSV import: dry run first, tolerant of other systems’ column names, idempotent, all-or-nothing for stock
+  ---
+  duration_ms: 347.685093
+  type: 'test'
+  ...
+# Subtest: F-19 Books Health Check works without an account and finds the Zikis problems
+ok 56 - F-19 Books Health Check works without an account and finds the Zikis problems
+  ---
+  duration_ms: 4.907997
+  type: 'test'
+  ...
+# Subtest: F-20 owner summary, digest, and webhook safety (no calls into private networks)
+ok 57 - F-20 owner summary, digest, and webhook safety (no calls into private networks)
+  ---
+  duration_ms: 470.786762
+  type: 'test'
+  ...
+# Subtest: F-21 forecast uses same-weekday history; reorder suggestions use real usage and reorder levels
+ok 58 - F-21 forecast uses same-weekday history; reorder suggestions use real usage and reorder levels
+  ---
+  duration_ms: 387.58565
+  type: 'test'
+  ...
+# Subtest: F-21b billing: trial, plan, invoice, overdue read-only, payment restores trading
+ok 59 - F-21b billing: trial, plan, invoice, overdue read-only, payment restores trading
+  ---
+  duration_ms: 1092.343189
+  type: 'test'
+  ...
+# Subtest: F-22 multi-outlet: bills, stock and sales are separated by outlet
+ok 60 - F-22 multi-outlet: bills, stock and sales are separated by outlet
+  ---
+  duration_ms: 421.797975
+  type: 'test'
+  ...
+# Subtest: F-23 the app can be installed as a phone app (manifest, service worker, icon)
+ok 61 - F-23 the app can be installed as a phone app (manifest, service worker, icon)
+  ---
+  duration_ms: 3.428909
+  type: 'test'
+  ...
+# soak ok: 600 events -> 356 journals, 298 stock moves, stats {"ok":1861,"rejected":115,"stock_takes":20}
+# Subtest: AT-34 soak: 600 random events, invariants hold every 25 events
+ok 62 - AT-34 soak: 600 random events, invariants hold every 25 events
+  ---
+  duration_ms: 8761.656189
+  type: 'test'
+  ...
+# Subtest: AT-35 concurrency: 40 simultaneous sales, payments and wastage entries keep every invariant
+ok 63 - AT-35 concurrency: 40 simultaneous sales, payments and wastage entries keep every invariant
+  ---
+  duration_ms: 702.491507
+  type: 'test'
+  ...
+# soak2 ok: 500 events -> 676 journals, 288 stock moves, 46 stays, 12 payroll runs, 17 refunds; {"ok":1199,"rejected":10}
+# Subtest: AT-36 soak: random mix of every feature keeps all 15 invariants
+ok 64 - AT-36 soak: random mix of every feature keeps all 15 invariants
+  ---
+  duration_ms: 9018.349278
+  type: 'test'
+  ...
+1..64
+# tests 64
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 1
+# duration_ms 51938.062118
