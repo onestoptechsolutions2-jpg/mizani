@@ -38,7 +38,7 @@ services:
       ALLOW_SIGNUP: ${ALLOW_SIGNUP:-true}
       PORT: 3000
     ports:
-      - "${PORT:-3000}:3000"
+      - "4010:3000"
 
   backup:
     build: { context: ., target: runtime }
